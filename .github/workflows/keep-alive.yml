@@ -3,6 +3,8 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '*/10 * * * *'
+permissions:
+  contents: write
 jobs:
   ping:
     runs-on: ubuntu-latest
@@ -41,4 +43,4 @@ jobs:
           echo "Last keep-alive: $(date)" > .github/keep-alive.txt
           git add .github/keep-alive.txt
           git commit -m "chore: keep alive $(date +%Y-%m-%d) [skip ci]"
-          git push
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
