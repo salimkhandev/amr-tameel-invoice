@@ -17,10 +17,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Get all users
+    // Get all users (excluding seed users)
     const { data: users, error } = await supabaseAdmin
       .from('users')
-      .select('id, username, full_name, role, is_active, created_at, updated_at')
+      .select('id, username, full_name, role, is_active, is_seed, created_at, updated_at')
+      .eq('is_seed', false)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -82,7 +83,8 @@ export async function POST(request: NextRequest) {
         password_hash,
         full_name: full_name || null,
         role,
-        is_active: true
+        is_active: true,
+        is_seed: false
       })
       .select('id, username, full_name, role, is_active, created_at')
       .single();

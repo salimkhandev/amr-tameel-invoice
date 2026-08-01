@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
   full_name VARCHAR(100),
   role VARCHAR(20) DEFAULT 'user' CHECK (role IN ('admin', 'user')),
   is_active BOOLEAN DEFAULT true,
+  is_seed BOOLEAN DEFAULT false,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

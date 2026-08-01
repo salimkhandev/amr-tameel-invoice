@@ -215,6 +215,9 @@ export const UserManagementPanel: React.FC = () => {
           <Shield className="w-5 h-5 text-[#204978]" />
           <h3 className="font-bold text-lg text-[#204978]">User Management</h3>
         </div>
+        <div className="text-xs text-gray-500">
+          Seed users (like default admin) are hidden
+        </div>
         <button
           onClick={() => {
             setShowAddModal(true);
@@ -233,6 +236,7 @@ export const UserManagementPanel: React.FC = () => {
         <div className="text-center py-8 text-gray-500">
           <UserIcon className="w-12 h-12 mx-auto mb-3 text-gray-300" />
           <p>No users found. Add your first user to get started.</p>
+          <p className="text-xs text-gray-400 mt-2">Note: Seed users (like the default admin) are hidden from this list.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -283,15 +287,13 @@ export const UserManagementPanel: React.FC = () => {
                 >
                   <Edit2 className="w-4 h-4" />
                 </button>
-                {user.id !== currentUser?.id && (
-                  <button
-                    onClick={() => handleDeleteUser(user.id)}
-                    className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                    title="Delete user"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                )}
+                <button
+                  onClick={() => handleDeleteUser(user.id)}
+                  className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                  title="Delete user"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
               </div>
             </div>
           ))}

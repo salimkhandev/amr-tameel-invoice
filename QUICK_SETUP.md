@@ -89,8 +89,10 @@ After first login, immediately change the admin password:
 - Username: `admin`
 - Password: `admin123`
 - Role: `admin`
+- Type: Seed user (hidden from user management)
 
 ⚠️ **IMPORTANT**: Change the admin password immediately after first login!
+📝 **Note**: The default admin user is marked as a seed user and will not appear in the user management list.
 
 ## 🔧 Troubleshooting
 
@@ -102,6 +104,11 @@ After first login, immediately change the admin password:
 **User Management not visible:**
 - Verify you're logged in as admin user
 - Check JWT_SECRET is set in `.env`
+
+**Admin user not showing in user list:**
+- This is expected - the default admin is a seed user and is hidden
+- Seed users are protected and cannot be deleted through the UI
+- You can still use the admin account for login
 
 **Keep-alive not working:**
 - Verify GitHub secrets are added correctly

@@ -3,4 +3,5 @@ export interface User {
   username: string;
   full_name?: string;
   role: string;
+  is_seed?: boolean;
 }

@@ -44,15 +44,15 @@ async function createAdminUser() {
     if (checkResult.rows.length > 0) {
       console.log('Admin user already exists. Updating password...');
       await client.query(
-        'UPDATE users SET password_hash = $1, full_name = $2 WHERE username = $3',
+        'UPDATE users SET password_hash = $1, full_name = $2, is_seed = true WHERE username = $3',
         [passwordHash, adminFullName, adminUsername]
       );
       console.log('Admin user updated successfully!');
     } else {
       console.log('Creating new admin user...');
       await client.query(
-        'INSERT INTO users (username, password_hash, full_name, role, is_active) VALUES ($1, $2, $3, $4, $5)',
-        [adminUsername, passwordHash, adminFullName, 'admin', true]
+        'INSERT INTO users (username, password_hash, full_name, role, is_active, is_seed) VALUES ($1, $2, $3, $4, $5, $6)',
+        [adminUsername, passwordHash, adminFullName, 'admin', true, true]
       );
       console.log('Admin user created successfully!');
     }

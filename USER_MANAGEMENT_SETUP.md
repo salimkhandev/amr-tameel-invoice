@@ -125,6 +125,8 @@ Add these secrets to your GitHub repository (Settings → Secrets and variables 
 - ✅ Delete users completely
 - ✅ View all users with their status
 - ✅ Email field removed for simplified user management
+- ✅ Seed users (like default admin) are hidden from user management
+- ✅ Seed users cannot be deleted through the UI
 
 **User Roles:**
 - `admin`: Full access to user management and all features
@@ -214,6 +216,7 @@ Add these secrets to your GitHub repository (Settings → Secrets and variables 
 - `full_name` (String, Optional)
 - `role` (String: 'admin' | 'user')
 - `is_active` (Boolean)
+- `is_seed` (Boolean) - Marks seed users (like default admin) that are hidden from user management
 - `created_at` (Timestamp)
 - `updated_at` (Timestamp)
 

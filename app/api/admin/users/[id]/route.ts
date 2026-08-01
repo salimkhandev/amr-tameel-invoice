@@ -75,6 +75,20 @@ export async function DELETE(
 
     const { id } = params;
 
+    // Check if user is a seed user
+    const { data: user } = await supabaseAdmin
+      .from('users')
+      .select('is_seed')
+      .eq('id', id)
+      .single();
+
+    if (user?.is_seed) {
+      return NextResponse.json(
+        { error: 'Cannot delete seed users' },
+        { status: 400 }
+      );
+    }
+
     // Prevent deleting the current admin
     if (payload.id === id) {
       return NextResponse.json(
