@@ -33,6 +33,10 @@ function buildHtmlDocument(html: string, css?: string): string {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Load Cairo font for Arabic text support -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>try{window.tailwind={}}catch{}</script>
     <script>tailwind.config = { corePlugins: { preflight: false } };</script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -41,8 +45,9 @@ function buildHtmlDocument(html: string, css?: string): string {
       @page { size: A4; margin: 0; }
       /* Use PDF margins only; avoid body padding to prevent overflow to a second page */
       html, body { margin: 0; padding: 0; background: #ffffff; color: #111827; }
-      /* Optional base font defaults to sans-serif if Geist not available */
-      body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Cairo", sans-serif; }
+      /* Force Cairo font for Arabic text support */
+      body { font-family: 'Cairo', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", sans-serif; }
+      * { font-family: 'Cairo', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", sans-serif; }
     </style>
     ${css ? `<style>${css}</style>` : ""}
   </head>
@@ -109,8 +114,8 @@ export async function POST(req: Request) {
     });
     console.log("Page content set");
 
-    // Add a short delay to ensure scripts have time to execute
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // Add a longer delay to ensure fonts are fully loaded and rendered
+    await new Promise(resolve => setTimeout(resolve, 3000));
     console.log("Wait timeout completed");
 
     const pdfBuffer = await page.pdf({
