@@ -36,7 +36,7 @@ export const AppHeader: React.FC = () => {
           <Link href="/dashboard" className="flex items-center gap-2 font-bold text-lg hover:opacity-90">
             <FileText className="w-6 h-6 text-blue-300" />
             <span className="hidden sm:inline">Amar Tameel</span>
-            <span className="sm:hidden">AT</span>
+            <span className="sm:hidden">Amar Tameel</span>
           </Link>
 
           {/* PWA Install Button */}
