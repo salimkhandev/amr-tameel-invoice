@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { UserPlus, Trash2, Edit2, Shield, User as UserIcon, Lock, Unlock, ArrowRight, ArrowLeft } from 'lucide-react';
+import { AlertModal } from '@/components/ui/AlertModal';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
 
 interface User {
   id: string;
@@ -9,6 +11,7 @@ interface User {
   full_name: string | null;
   role: string;
   is_active: boolean;
+  is_seed: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -21,6 +24,22 @@ export const UserManagementPanel: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
+
+  // Custom modals state
+  const [alertModal, setAlertModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: 'success' | 'error' | 'info';
+  }>({ isOpen: false, title: '', message: '', type: 'info' });
+
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    type: 'danger' | 'warning' | 'info';
+  }>({ isOpen: false, title: '', message: '', onConfirm: () => {}, type: 'danger' });
 
   // Multi-step form state
   const [currentStep, setCurrentStep] = useState(1);
@@ -100,11 +119,21 @@ export const UserManagementPanel: React.FC = () => {
           setShowAddModal(false);
           setCurrentStep(1);
           setNewUser({ full_name: '', username: '', password: '', role: 'user' });
-          alert('User created successfully');
+          setAlertModal({
+            isOpen: true,
+            title: 'Success',
+            message: 'User created successfully',
+            type: 'success'
+          });
         }
       } else {
         const error = await response.json();
-        alert(error.error || 'Failed to create user');
+        setAlertModal({
+          isOpen: true,
+          title: 'Error',
+          message: error.error || 'Failed to create user',
+          type: 'error'
+        });
       }
     } catch (error) {
       console.error('Failed to create user:', error);
@@ -133,11 +162,21 @@ export const UserManagementPanel: React.FC = () => {
           setShowEditModal(false);
           setSelectedUser(null);
           setEditUser({ full_name: '', role: 'user', is_active: true, password: '' });
-          alert('User updated successfully');
+          setAlertModal({
+            isOpen: true,
+            title: 'Success',
+            message: 'User updated successfully',
+            type: 'success'
+          });
         }
       } else {
         const error = await response.json();
-        alert(error.error || 'Failed to update user');
+        setAlertModal({
+          isOpen: true,
+          title: 'Error',
+          message: error.error || 'Failed to update user',
+          type: 'error'
+        });
       }
     } catch (error) {
       console.error('Failed to update user:', error);
@@ -146,28 +185,50 @@ export const UserManagementPanel: React.FC = () => {
   };
 
   const handleDeleteUser = async (userId: string) => {
-    if (!confirm('Are you sure you want to delete this user?')) return;
-    if (!token) return;
+    setConfirmModal({
+      isOpen: true,
+      title: 'Delete User',
+      message: 'Are you sure you want to delete this user? This action cannot be undone.',
+      onConfirm: async () => {
+        if (!token) return;
 
-    try {
-      const response = await fetch(`/api/admin/users/${userId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
+        try {
+          const response = await fetch(`/api/admin/users/${userId}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+
+          if (response.ok) {
+            loadUsers();
+            setAlertModal({
+              isOpen: true,
+              title: 'Success',
+              message: 'User deleted successfully',
+              type: 'success'
+            });
+          } else {
+            const error = await response.json();
+            setAlertModal({
+              isOpen: true,
+              title: 'Error',
+              message: error.error || 'Failed to delete user',
+              type: 'error'
+            });
+          }
+        } catch (error) {
+          console.error('Failed to delete user:', error);
+          setAlertModal({
+            isOpen: true,
+            title: 'Error',
+            message: 'Failed to delete user',
+            type: 'error'
+          });
         }
-      });
-
-      if (response.ok) {
-        loadUsers();
-        alert('User deleted successfully');
-      } else {
-        const error = await response.json();
-        alert(error.error || 'Failed to delete user');
-      }
-    } catch (error) {
-      console.error('Failed to delete user:', error);
-      alert('Failed to delete user');
-    }
+      },
+      type: 'danger'
+    });
   };
 
   const openEditModal = (user: User) => {
@@ -183,11 +244,21 @@ export const UserManagementPanel: React.FC = () => {
 
   const nextStep = () => {
     if (currentStep === 1 && !newUser.full_name.trim()) {
-      alert('Please enter full name');
+      setAlertModal({
+        isOpen: true,
+        title: 'Validation Error',
+        message: 'Please enter full name',
+        type: 'error'
+      });
       return;
     }
     if (currentStep === 2 && (!newUser.username.trim() || !newUser.password.trim())) {
-      alert('Please enter username and password');
+      setAlertModal({
+        isOpen: true,
+        title: 'Validation Error',
+        message: 'Please enter username and password',
+        type: 'error'
+      });
       return;
     }
     setCurrentStep(currentStep + 1);
@@ -528,6 +599,25 @@ export const UserManagementPanel: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Custom Alert Modal */}
+      <AlertModal
+        isOpen={alertModal.isOpen}
+        onClose={() => setAlertModal({ ...alertModal, isOpen: false })}
+        title={alertModal.title}
+        message={alertModal.message}
+        type={alertModal.type}
+      />
+
+      {/* Custom Confirm Modal */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
+        onConfirm={confirmModal.onConfirm}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        type={confirmModal.type}
+      />
     </div>
   );
 };
