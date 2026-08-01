@@ -106,7 +106,7 @@ export async function POST(req: Request) {
     const page = await browser.newPage();
     console.log("New page created");
     
-    await page.setViewport({ width: 794, height: 1123, deviceScaleFactor: 2 });
+    await page.setViewport({ width: 794, height: 1123, deviceScaleFactor: 1 });
     console.log("Viewport set");
     
     const htmlDocument = buildHtmlDocument(html, css);
@@ -118,9 +118,9 @@ export async function POST(req: Request) {
     });
     console.log("Page content set");
 
-    // Short delay to ensure fonts are loaded
-    await new Promise(resolve => setTimeout(resolve, 500));
-    console.log("Wait timeout completed");
+    // Small delay to ensure fonts are loaded
+    await new Promise(resolve => setTimeout(resolve, 200));
+    console.log("Wait completed");
 
     const pdfBuffer = await page.pdf({
       format: "A4",
