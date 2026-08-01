@@ -48,7 +48,6 @@ export async function generatePdf(
     backgroundColor: '#ffffff',
     logging: false,
     allowTaint: true,
-    letterRendering: false, // Disabled for better Arabic ligature support
     imageTimeout: 30000,
     removeContainer: true,
     // Force explicit dimensions to avoid viewport issues

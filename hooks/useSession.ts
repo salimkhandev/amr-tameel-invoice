@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { isClientAuthenticated, getClientSessionUser, loginClient, logoutClient, User } from '@/lib/auth';
+import { isClientAuthenticated, getClientSessionUser, loginClient, logoutClient } from '@/lib/auth';
+import type { User } from '@/types/user';
 
 export function useSession() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);

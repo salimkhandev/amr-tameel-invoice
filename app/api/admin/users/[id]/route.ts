@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs';
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Verify admin access
@@ -20,11 +20,11 @@ export async function PATCH(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const updates = await request.json();
 
     // Prevent updating certain fields
-    const allowedUpdates = {
+    const allowedUpdates: any = {
       full_name: updates.full_name,
       role: updates.role,
       is_active: updates.is_active
@@ -58,7 +58,7 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Verify admin access
@@ -73,7 +73,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // Check if user is a seed user
     const { data: user } = await supabaseAdmin
