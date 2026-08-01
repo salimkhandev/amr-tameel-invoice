@@ -9,32 +9,33 @@ interface DeliveryOrderTemplateProps {
   onOrderChange?: (updated: DeliveryOrder) => void;
 }
 
-/** Inline-editable span — when onChange is undefined it renders as plain text */
+/** Inline-editable input — when onChange is undefined it renders as plain text */
 function E({
   value,
   onChange,
   dir = 'auto',
   className = '',
+  type = 'text',
 }: {
   value: string;
   onChange?: (v: string) => void;
   dir?: 'ltr' | 'rtl' | 'auto';
   className?: string;
+  type?: 'text' | 'tel' | 'number';
 }) {
   if (!onChange) return <span dir={dir} className={className}>{value}</span>;
   return (
-    <span
-      contentEditable
-      suppressContentEditableWarning
+    <input
+      type={type}
+      defaultValue={value}
       dir={dir}
-      className={`outline-none focus:bg-blue-50 focus:ring-1 focus:ring-blue-400 rounded cursor-text ${className}`}
-      onBlur={(e) => onChange(e.currentTarget.textContent ?? '')}
+      onBlur={(e) => onChange(e.target.value)}
       onKeyDown={(e) => {
-        if (e.key === 'Enter') { e.preventDefault(); (e.currentTarget as HTMLElement).blur(); }
+        if (e.key === 'Enter') { e.preventDefault(); e.currentTarget.blur(); }
       }}
-    >
-      {value}
-    </span>
+      className={`bg-transparent border-none outline-none focus:bg-blue-50 focus:ring-1 focus:ring-blue-400 rounded cursor-text ${className}`}
+      style={{ width: `${Math.max(value.length, 1)}ch` }}
+    />
   );
 }
 
