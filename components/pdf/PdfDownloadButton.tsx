@@ -52,7 +52,7 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
       }
       
       const cleanDate = order.deliveryDate ? order.deliveryDate.replace(/[/\\?%*:|"<>]/g, '-') : 'date';
-      const filename = `delivery-order-${order.invoiceNumber}-${cleanDate}.pdf`;
+      const filename = `order-${order.invoiceNumber}-${cleanDate}.pdf`;
 
       // Send to server-side PDF generation
       const response = await fetch('/api/render-pdf', {

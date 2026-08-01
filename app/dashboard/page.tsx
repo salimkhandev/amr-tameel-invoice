@@ -44,7 +44,7 @@ export default function DashboardPage() {
             <div className="lg:col-span-2 flex flex-col gap-4">
               <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200 shadow-sm">
                 <h2 className="font-bold text-base sm:text-lg text-[#204978] mb-3">
-                  Welcome to Delivery Order System
+                  Welcome to Amar Tameel
                 </h2>
                 <p className="text-sm text-gray-600 mb-4">
                   Click "Create New Delivery Order" to generate a new delivery order. 

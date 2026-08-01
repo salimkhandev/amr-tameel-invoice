@@ -51,7 +51,7 @@ export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
       }
       
       const cleanDate = order.deliveryDate ? order.deliveryDate.replace(/[/\\?%*:|"<>]/g, '-') : 'date';
-      const filename = `delivery-order-${order.invoiceNumber}-${cleanDate}.pdf`;
+      const filename = `order-${order.invoiceNumber}-${cleanDate}.pdf`;
 
       // Send to server-side PDF generation
       const response = await fetch('/api/render-pdf', {
@@ -81,7 +81,7 @@ export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
       ) {
         await navigator.share({
           title: filename,
-          text: `Delivery Order #${order.invoiceNumber}`,
+          text: `Order #${order.invoiceNumber}`,
           files: [file],
         });
         return;
@@ -98,7 +98,7 @@ export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
       document.body.removeChild(a);
 
       const msg = encodeURIComponent(
-        `Delivery Order #${order.invoiceNumber} - PDF file attached.`
+        `Order #${order.invoiceNumber} - PDF file attached.`
       );
       // Using wa.me without phone number to let user select contact
       const whatsappUrl = `https://wa.me/?text=${msg}`;

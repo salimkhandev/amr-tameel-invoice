@@ -1,6 +1,6 @@
 {
-  "name": "Delivery Order System",
-  "short_name": "Delivery Order",
+  "name": "Amar Tameel",
+  "short_name": "Amar Tameel",
   "description": "Create and manage delivery orders with PDF generation",
   "start_url": "/",
   "display": "standalone",

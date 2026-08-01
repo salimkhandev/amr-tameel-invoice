@@ -31,7 +31,7 @@ export const LoginForm: React.FC = () => {
     <div className="w-full max-w-md p-6 bg-white rounded-xl shadow-lg border border-gray-100 font-cairo">
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold text-[#204978]">Login</h2>
-        <p className="text-sm text-gray-500 mt-1">Delivery Order Creation System</p>
+        <p className="text-sm text-gray-500 mt-1">Amar Tameel</p>
       </div>
 
       {error && (
