@@ -22,7 +22,7 @@ async function createAdminUser() {
   // Default admin credentials
   const adminUsername = 'admin';
   const adminPassword = 'admin123';
-  const adminFullName = 'Admin User';
+  const adminFullName = 'Mudassir Zahir';
 
   try {
     console.log('Connecting to Supabase...');
