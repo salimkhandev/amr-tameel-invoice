@@ -7,6 +7,7 @@ import { useSession } from '@/hooks/useSession';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { FileText, PlusCircle, LogOut, WifiOff, Menu, X } from 'lucide-react';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { PwaInstallButton } from '@/components/pwa/PwaInstallButton';
 
 export const AppHeader: React.FC = () => {
   const { logout, user } = useSession();
@@ -74,6 +75,9 @@ export const AppHeader: React.FC = () => {
             <span>Logout</span>
           </button>
 
+          {/* PWA Install Button */}
+          <PwaInstallButton />
+
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -119,6 +123,11 @@ export const AppHeader: React.FC = () => {
               <LogOut className="w-5 h-5" />
               <span>Logout</span>
             </button>
+
+            {/* PWA Install Button for Mobile */}
+            <div className="px-4">
+              <PwaInstallButton />
+            </div>
           </nav>
         </div>
       )}
