@@ -68,7 +68,7 @@ export const WelcomeFlashScreen: React.FC<WelcomeFlashScreenProps> = ({
               transition: 'opacity 0.5s ease-out 0.2s',
             }}
           >
-            <span className="text-5xl font-bold text-white">AT</span>
+            <span className="text-xl sm:text-5xl font-bold text-white text-center leading-tight">Amar Tameel</span>
           </div>
         </div>
 
