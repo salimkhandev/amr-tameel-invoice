@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase';
 import { verifyToken } from '@/lib/jwt';
 import bcrypt from 'bcryptjs';
 

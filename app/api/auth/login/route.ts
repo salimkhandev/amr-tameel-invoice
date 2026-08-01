@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if Supabase is configured
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
       // Fallback to environment variable auth
       const AUTH_USERNAME = process.env.NEXT_PUBLIC_AUTH_USERNAME || 'mudassir2030';
       const AUTH_PASSWORD = process.env.NEXT_PUBLIC_AUTH_PASSWORD || 'mudassir2030';
@@ -42,8 +42,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Supabase authentication
-    const { data: user, error } = await supabase
+    // Supabase authentication using admin client
+    const { data: user, error } = await supabaseAdmin
       .from('users')
       .select('*')
       .eq('username', username)

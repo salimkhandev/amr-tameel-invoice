@@ -28,22 +28,24 @@
 
 ## 🔧 What You Need to Do
 
-### 1. Get Supabase Anon Key (REQUIRED)
+### 1. Supabase Keys (Already Configured) ✅
+Your Supabase credentials are already configured in the `.env` file:
+- **Project URL:** `https://rxtjyhcoosaijykritif.supabase.co`
+- **Anon Key:** Already configured
+- **Service Role Key:** Already configured
+
+**Optional:** If you need to update these keys in the future:
 1. Go to https://supabase.com/dashboard
 2. Navigate to your project
 3. Go to Settings → API
-4. Copy the `anon public` key
-5. Update your `.env` file:
-   ```bash
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_actual_anon_key_here
-   ```
+4. Copy the keys and update your `.env` file
 
 ### 2. Add GitHub Secrets (REQUIRED)
 1. Go to https://github.com/salimkhandev/amr-tameel-invoice
 2. Click on Settings → Secrets and variables → Actions
 3. Add these secrets:
    - `SUPABASE_URL`: `https://rxtjyhcoosaijykritif.supabase.co`
-   - `SUPABASE_ANON_KEY`: Your actual anon key (same as above)
+   - `SUPABASE_SERVICE_ROLE_KEY`: Your service role key (from .env file)
    - `VERCEL_URL`: `https://your-app-name.vercel.app` (after deployment)
 
 ### 3. Test the Application
@@ -113,12 +115,11 @@ After first login, immediately change the admin password:
 
 ## 🚀 Next Steps
 
-1. Get your Supabase anon key and update `.env`
-2. Add GitHub secrets for the workflow
-3. Test the application locally
-4. Change the default admin password
-5. Deploy to Vercel
-6. Update `VERCEL_URL` in GitHub secrets
-7. Create additional users as needed
+1. Add GitHub secrets for the workflow (SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, VERCEL_URL)
+2. Test the application locally
+3. Change the default admin password
+4. Deploy to Vercel
+5. Update `VERCEL_URL` in GitHub secrets
+6. Create additional users as needed
 
 Your user management system is ready to use! 🎉

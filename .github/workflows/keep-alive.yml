@@ -13,8 +13,8 @@ jobs:
       - name: Ping Supabase Project
         run: |
           curl --fail \
-            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "apikey: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
             "${{ secrets.SUPABASE_URL }}/rest/v1/users?limit=1"
 
       - name: Ping Health Check Endpoint

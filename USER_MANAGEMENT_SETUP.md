@@ -19,21 +19,20 @@ Your Supabase connection details are already configured:
 - **Database Port**: `6543`
 - **Database User**: `postgres.rxtjyhcoosaijykritif`
 
-**To get the Anon Key:**
+**To get the Supabase Keys:**
 1. Go to your Supabase project dashboard at https://supabase.com/dashboard
 2. Navigate to your project
 3. Go to Settings → API
-4. Look for `anon public` key under "Project API keys"
-5. Copy the anon key (starts with `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`)
-6. Update your `.env` file with the anon key in `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+4. Copy the following keys:
+   - **anon public key** (starts with `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`)
+   - **service_role secret key** (also starts with `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`)
+5. Update your `.env` file with both keys:
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = anon public key
+   - `SUPABASE_SERVICE_ROLE_KEY` = service_role secret key
 
 ### 3. Environment Variables
 
-Your `.env` file has been created with most configuration already set up. You only need to:
-
-**Update the SUPABASE_ANON_KEY:**
-1. Get your anon key from Supabase dashboard (see step 2)
-2. Update the `.env` file: `NEXT_PUBLIC_SUPABASE_ANON_KEY=your_actual_anon_key_here`
+Your `.env` file has been created with all Supabase credentials already configured:
 
 **Current .env configuration:**
 ```bash
@@ -43,7 +42,8 @@ NEXT_PUBLIC_AUTH_PASSWORD=admin123
 
 # Supabase Configuration (for user management)
 NEXT_PUBLIC_SUPABASE_URL=https://rxtjyhcoosaijykritif.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key_here  # ← UPDATE THIS
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...  # Already configured
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...  # Already configured
 
 # Supabase Database Connection (for direct database access)
 SUPABASE_HOST=aws-0-ap-northeast-1.pooler.supabase.com
@@ -59,6 +59,8 @@ JWT_SECRET=amr-tameel-invoice-secret-key-2024-change-in-production
 # Optional: Admin email for notifications
 ADMIN_EMAIL=admin@example.com
 ```
+
+✅ **All Supabase credentials are already configured in your .env file!**
 
 ### 4. Database Setup (Already Completed)
 
@@ -95,9 +97,10 @@ Add these secrets to your GitHub repository (Settings → Secrets and variables 
    - Value: `https://rxtjyhcoosaijykritif.supabase.co`
    - This is the same as `NEXT_PUBLIC_SUPABASE_URL` in your .env file
 
-2. `SUPABASE_ANON_KEY` - Your Supabase anon key
-   - Value: Your actual anon key from Supabase dashboard
-   - This is the same as `NEXT_PUBLIC_SUPABASE_ANON_KEY` in your .env file
+2. `SUPABASE_SERVICE_ROLE_KEY` - Your Supabase service role key
+   - Value: Your actual service role key from Supabase dashboard
+   - This is the same as `SUPABASE_SERVICE_ROLE_KEY` in your .env file
+   - **Important:** Use service role key for admin operations, not anon key
 
 3. `VERCEL_URL` - Your Vercel application URL
    - Value: `https://your-app-name.vercel.app` (update after deployment)
