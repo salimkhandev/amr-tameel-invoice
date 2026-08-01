@@ -9,6 +9,7 @@ export interface GeneratePdfResult {
 
 /**
  * Capture HTML element and generate high quality A4 PDF
+ * Optimized for print quality with high DPI and lossless compression
  */
 export async function generatePdf(
   element: HTMLElement,
@@ -20,23 +21,42 @@ export async function generatePdf(
     await document.fonts.ready;
   }
 
-  // Scale 1.5 = 150 DPI equivalent — crisp for A4 print, half the canvas area vs 2x
+  // High quality settings for professional PDF output
   const canvas = await html2canvas(element, {
-    scale: 1.5,
+    scale: 3, // 300 DPI equivalent - much higher quality for print
     useCORS: true,
     backgroundColor: '#ffffff',
     logging: false,
+    allowTaint: true,
+    // Improve text rendering
+    letterRendering: true,
+    // Better image quality
+    imageTimeout: 0,
+    // Remove scrollbars
+    removeContainer: true,
+    // Improve canvas quality
+    foreignObjectRendering: true,
   });
 
-  // JPEG at 0.88 quality is visually identical to PNG but ~75% smaller in file size
-  const imgData = canvas.toDataURL('image/jpeg', 0.88);
-  const pdf = new jsPDF('p', 'px', 'a4');
+  // Use PNG for lossless quality (higher quality than JPEG)
+  const imgData = canvas.toDataURL('image/png', 1.0);
+  
+  // Use mm units for better print quality
+  const pdf = new jsPDF('p', 'mm', 'a4');
 
-  const pageWidth = pdf.internal.pageSize.getWidth();
-  const imgWidth = pageWidth;
-  const imgHeight = (canvas.height * pageWidth) / canvas.width;
+  // A4 dimensions in mm
+  const a4Width = 210;
+  const a4Height = 297;
 
-  pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+  // Calculate dimensions to maintain aspect ratio
+  const imgWidth = a4Width;
+  const imgHeight = (canvas.height * a4Width) / canvas.width;
+
+  // Center the image on the page
+  const x = 0;
+  const y = 0;
+
+  pdf.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight, undefined, 'FAST');
 
   const cleanDate = deliveryDate ? deliveryDate.replace(/[/\\?%*:|"<>]/g, '-') : 'date';
   const filename = `delivery-order-${invoiceNumber}-${cleanDate}.pdf`;
