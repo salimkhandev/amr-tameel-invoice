@@ -9,7 +9,6 @@ export interface GeneratePdfResult {
 
 /**
  * Capture HTML element and generate high quality A4 PDF
- * Optimized for print quality with high DPI and lossless compression
  */
 export async function generatePdf(
   element: HTMLElement,
@@ -21,25 +20,20 @@ export async function generatePdf(
     await document.fonts.ready;
   }
 
-  // High quality settings for professional PDF output
+  // High quality settings - scale 2 for good balance of quality and performance
   const canvas = await html2canvas(element, {
-    scale: 3, // 300 DPI equivalent - much higher quality for print
+    scale: 2, // 200 DPI equivalent - good quality without performance issues
     useCORS: true,
     backgroundColor: '#ffffff',
     logging: false,
     allowTaint: true,
-    // Improve text rendering
     letterRendering: true,
-    // Better image quality
-    imageTimeout: 0,
-    // Remove scrollbars
+    imageTimeout: 15000, // 15 second timeout
     removeContainer: true,
-    // Improve canvas quality
-    foreignObjectRendering: true,
   });
 
-  // Use PNG for lossless quality (higher quality than JPEG)
-  const imgData = canvas.toDataURL('image/png', 1.0);
+  // Use JPEG with high quality for better performance
+  const imgData = canvas.toDataURL('image/jpeg', 0.95);
   
   // Use mm units for better print quality
   const pdf = new jsPDF('p', 'mm', 'a4');
@@ -56,7 +50,7 @@ export async function generatePdf(
   const x = 0;
   const y = 0;
 
-  pdf.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight, undefined, 'FAST');
+  pdf.addImage(imgData, 'JPEG', x, y, imgWidth, imgHeight);
 
   const cleanDate = deliveryDate ? deliveryDate.replace(/[/\\?%*:|"<>]/g, '-') : 'date';
   const filename = `delivery-order-${invoiceNumber}-${cleanDate}.pdf`;
