@@ -1,16 +1,40 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { AuthGate } from '@/components/auth/AuthGate';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { RecentHistoryPanel } from '@/components/dashboard/RecentHistoryPanel';
 import { UserManagementPanel } from '@/components/admin/UserManagementPanel';
+import { WelcomeFlashScreen } from '@/components/ui/WelcomeFlashScreen';
+import { useSession } from '@/hooks/useSession';
 import { PlusCircle } from 'lucide-react';
 
 export default function DashboardPage() {
+  const { user } = useSession();
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  useEffect(() => {
+    // Check if this is a fresh login (not a page refresh)
+    const hasShownWelcome = sessionStorage.getItem('welcomeShown');
+    if (!hasShownWelcome && user) {
+      setShowWelcome(true);
+      sessionStorage.setItem('welcomeShown', 'true');
+    }
+  }, [user]);
+
+  const handleWelcomeComplete = () => {
+    setShowWelcome(false);
+  };
+
   return (
     <AuthGate>
+      {showWelcome && user && (
+        <WelcomeFlashScreen
+          userName={user.full_name || user.username}
+          onComplete={handleWelcomeComplete}
+        />
+      )}
       <div className="min-h-screen bg-gray-50 flex flex-col font-cairo">
         <AppHeader />
 
