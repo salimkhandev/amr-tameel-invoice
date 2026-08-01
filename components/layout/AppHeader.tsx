@@ -30,7 +30,7 @@ export const AppHeader: React.FC = () => {
 
   return (
     <header className="w-full bg-[#204978] text-white shadow-md font-cairo border-b border-[#18365a]">
-      <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+      <div className="max-w-7xl mx-auto px-4 py-2 sm:py-3 flex justify-between items-center">
         {/* Left: Brand & PWA Install */}
         <div className="flex items-center gap-3">
           <Link href="/dashboard" className="flex items-center gap-2 font-bold text-lg hover:opacity-90">

@@ -32,7 +32,7 @@ export const PdfPreviewScaler: React.FC<PdfPreviewScalerProps> = ({ children }) 
   }, []);
 
   return (
-    <div ref={containerRef} className="w-full flex justify-center overflow-hidden py-2">
+    <div ref={containerRef} className="w-full flex justify-center overflow-hidden py-1 sm:py-2">
       <div
         style={{
           width: `${A4_WIDTH}px`,
