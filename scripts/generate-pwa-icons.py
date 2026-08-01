@@ -43,18 +43,18 @@ def generate_icons():
     # Get paths
     script_dir = os.path.dirname(__file__)
     project_dir = os.path.join(script_dir, '..')
-    logo_path = os.path.join(project_dir, 'public', 'logo.png')
+    logo_path = os.path.join(project_dir, 'public', 'amar-logo.png')
     output_dir = os.path.join(project_dir, 'public')
     
     # Check if logo exists
     if not os.path.exists(logo_path):
-        print(f"Error: logo.png not found at {logo_path}")
-        print("Please ensure logo.png exists in the public directory.")
+        print(f"Error: amar-logo.png not found at {logo_path}")
+        print("Please ensure amar-logo.png exists in the public directory.")
         return
     
     os.makedirs(output_dir, exist_ok=True)
     
-    print("Generating PWA icons from logo.png...")
+    print("Generating PWA icons from amar-logo.png...")
     
     # Generate standard PWA icons
     for size in ICON_SIZES:
@@ -84,7 +84,7 @@ def generate_icons():
     icon_16.save(favicon_path, format='ICO', sizes=[(16, 16)])
     print(f"  Created: favicon.ico")
     
-    print("\n✅ All icons generated successfully from logo.png!")
+    print("\n✅ All icons generated successfully from amar-logo.png!")
     print(f"Output directory: {output_dir}")
 
 if __name__ == '__main__':
