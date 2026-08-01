@@ -9,6 +9,7 @@ export interface GeneratePdfResult {
 
 /**
  * Capture HTML element and generate high quality A4 PDF
+ * Optimized for print quality with high DPI and proper scaling
  */
 export async function generatePdf(
   element: HTMLElement,
@@ -20,37 +21,47 @@ export async function generatePdf(
     await document.fonts.ready;
   }
 
-  // High quality settings - scale 2 for good balance of quality and performance
+  // Calculate optimal scale with safety cap for large content
+  const maxDimension = 8000; // Safe across browsers
+  const targetScale = 4; // 384 DPI equivalent - print quality
+  const estimatedHeight = element.scrollHeight * targetScale;
+  const scale = estimatedHeight > maxDimension 
+    ? maxDimension / element.scrollHeight 
+    : targetScale;
+
+  // High quality settings for professional PDF output
   const canvas = await html2canvas(element, {
-    scale: 2, // 200 DPI equivalent - good quality without performance issues
+    scale: scale, // Dynamic scale up to 4 (384 DPI) for sharp output
     useCORS: true,
     backgroundColor: '#ffffff',
     logging: false,
     allowTaint: true,
-    letterRendering: true,
-    imageTimeout: 15000, // 15 second timeout
+    letterRendering: true, // Improve text rendering
+    imageTimeout: 30000, // 30 second timeout for complex rendering
     removeContainer: true,
+    // Force explicit dimensions to avoid viewport issues
+    windowWidth: element.scrollWidth,
+    windowHeight: element.scrollHeight,
   });
 
-  // Use JPEG with high quality for better performance
-  const imgData = canvas.toDataURL('image/jpeg', 0.95);
+  // Use PNG for lossless quality (sharper text and QR codes)
+  const imgData = canvas.toDataURL('image/png');
   
-  // Use mm units for better print quality
-  const pdf = new jsPDF('p', 'mm', 'a4');
+  // Use mm units for proper print quality
+  const pdf = new jsPDF({
+    orientation: 'portrait',
+    unit: 'mm',
+    format: 'a4',
+    compress: true,
+  });
 
   // A4 dimensions in mm
-  const a4Width = 210;
-  const a4Height = 297;
+  const imgWidthMm = 210; // A4 width
+  const pxPerMm = canvas.width / imgWidthMm;
+  const imgHeightMm = canvas.height / pxPerMm;
 
-  // Calculate dimensions to maintain aspect ratio
-  const imgWidth = a4Width;
-  const imgHeight = (canvas.height * a4Width) / canvas.width;
-
-  // Center the image on the page
-  const x = 0;
-  const y = 0;
-
-  pdf.addImage(imgData, 'JPEG', x, y, imgWidth, imgHeight);
+  // Add image with proper DPI-matched dimensions
+  pdf.addImage(imgData, 'PNG', 0, 0, imgWidthMm, imgHeightMm, undefined, 'FAST');
 
   const cleanDate = deliveryDate ? deliveryDate.replace(/[/\\?%*:|"<>]/g, '-') : 'date';
   const filename = `delivery-order-${invoiceNumber}-${cleanDate}.pdf`;
