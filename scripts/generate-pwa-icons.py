@@ -19,7 +19,7 @@ APPLE_SIZES = [
 # Favicon sizes
 FAVICON_SIZES = [16, 32, 48]
 
-def create_icon_from_logo(size, logo_path):
+def create_icon_from_logo(size, logo_path, is_favicon=False):
     """Create icon by resizing logo image"""
     try:
         # Open the logo image
@@ -31,6 +31,14 @@ def create_icon_from_logo(size, logo_path):
         
         # Resize to target size using high-quality resampling
         icon = logo.resize((size, size), Image.Resampling.LANCZOS)
+        
+        # For favicons, add white background to prevent darkness
+        if is_favicon:
+            # Create white background
+            white_bg = Image.new('RGBA', (size, size), (255, 255, 255, 255))
+            # Composite the icon onto white background
+            white_bg.paste(icon, (0, 0), icon)
+            icon = white_bg
         
         return icon
     except Exception as e:
@@ -72,14 +80,14 @@ def generate_icons():
     
     # Generate favicons
     for size in FAVICON_SIZES:
-        icon = create_icon_from_logo(size, logo_path)
+        icon = create_icon_from_logo(size, logo_path, is_favicon=True)
         filename = os.path.join(output_dir, f'favicon-{size}.png')
         icon.save(filename, 'PNG')
         print(f"  Created: favicon-{size}.png ({size}x{size})")
     
     # Create favicon.ico (using 16x16 and 32x32)
-    icon_16 = create_icon_from_logo(16, logo_path)
-    icon_32 = create_icon_from_logo(32, logo_path)
+    icon_16 = create_icon_from_logo(16, logo_path, is_favicon=True)
+    icon_32 = create_icon_from_logo(32, logo_path, is_favicon=True)
     favicon_path = os.path.join(output_dir, 'favicon.ico')
     icon_16.save(favicon_path, format='ICO', sizes=[(16, 16)])
     print(f"  Created: favicon.ico")
