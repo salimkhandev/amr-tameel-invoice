@@ -1,35 +1,29 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import Providers from '@/components/Providers';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://dr-haider-ali-khan-neurosurgeon.vercel.app'),
-  title: 'Health Next · Dr. Haider Ali Khan — Neurosurgeon',
-  description:
-    'AI-Assisted Patient Management & Ward Management System for Dr. Haider Ali Khan, Neurosurgeon at Health Next.',
-  robots: 'noindex,nofollow', // private clinical system
-  openGraph: {
-    title: 'Health Next · Dr. Haider Ali Khan',
-    description: 'Neurosurgery Practice Management & Clinical Suite',
-    url: 'https://dr-haider-ali-khan-neurosurgeon.vercel.app',
-    siteName: 'Health Next',
-    type: 'website',
-  },
+  title: 'Delivery Order Generator',
+  description: 'Application for creating and exporting delivery orders in PDF format',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="en">
+    <html lang="en" dir="ltr">
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-          rel="stylesheet"
-        />
+        <link rel="icon" href="/favicon.ico" />
       </head>
-      <body className="antialiased">
-        <Providers>{children}</Providers>
+      <body className="bg-gray-100 font-cairo text-slate-900 min-h-screen antialiased">
+        {children}
       </body>
     </html>
   );

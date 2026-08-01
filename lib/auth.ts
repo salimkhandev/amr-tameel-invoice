@@ -1,56 +1,37 @@
-import { NextAuthOptions } from 'next-auth';
-import CredentialsProvider from 'next-auth/providers/credentials';
-import bcrypt from 'bcryptjs';
-import { connectDB } from '@/lib/db';
-import User from '@/lib/models/User';
+/**
+ * Client-only soft auth gate engine
+ * Note: As a serverless static export, this acts as a light gate, not server-grade security.
+ */
 
-export const authOptions: NextAuthOptions = {
-  providers: [
-    CredentialsProvider({
-      name: 'Credentials',
-      credentials: {
-        email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' },
-      },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null;
+const SESSION_KEY = 'session:active';
+const USER_KEY = 'session:user';
 
-        await connectDB();
-        const user = await User.findOne({ email: credentials.email.toLowerCase() });
-        if (!user) return null;
+const AUTH_USERNAME = process.env.NEXT_PUBLIC_AUTH_USERNAME || 'mudassir2030';
+const AUTH_PASSWORD = process.env.NEXT_PUBLIC_AUTH_PASSWORD || 'mudassir2030';
 
-        const valid = await bcrypt.compare(credentials.password, user.passwordHash);
-        if (!valid) return null;
+export function loginClient(u: string, p: string): boolean {
+  if (typeof window === 'undefined') return false;
 
-        return {
-          id: user._id.toString(),
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        };
-      },
-    }),
-  ],
-  session: { strategy: 'jwt' },
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        token.role = (user as { role?: string }).role || 'doctor';
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as string;
-      }
-      return session;
-    },
-  },
-  pages: {
-    signIn: '/login',
-    error: '/login',
-  },
-  secret: process.env.NEXTAUTH_SECRET || 'nitroclinic_secret_key_2026',
-};
+  if (u.trim() === AUTH_USERNAME && p.trim() === AUTH_PASSWORD) {
+    localStorage.setItem(SESSION_KEY, 'true');
+    localStorage.setItem(USER_KEY, u.trim());
+    return true;
+  }
+  return false;
+}
+
+export function logoutClient(): void {
+  if (typeof window === 'undefined') return;
+  localStorage.removeItem(SESSION_KEY);
+  localStorage.removeItem(USER_KEY);
+}
+
+export function isClientAuthenticated(): boolean {
+  if (typeof window === 'undefined') return false;
+  return localStorage.getItem(SESSION_KEY) === 'true';
+}
+
+export function getClientSessionUser(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem(USER_KEY);
+}

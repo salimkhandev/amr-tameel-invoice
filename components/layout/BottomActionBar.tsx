@@ -1,0 +1,34 @@
+'use client';
+
+import React from 'react';
+import { DeliveryOrder } from '@/types/delivery-order';
+import { PdfDownloadButton } from '@/components/pdf/PdfDownloadButton';
+import { ShareToWhatsAppButton } from '@/components/pdf/ShareToWhatsAppButton';
+
+interface BottomActionBarProps {
+  templateRef: React.RefObject<HTMLDivElement | null>;
+  order: DeliveryOrder;
+  onSuccess?: () => void;
+}
+
+export const BottomActionBar: React.FC<BottomActionBarProps> = ({
+  templateRef,
+  order,
+  onSuccess,
+}) => {
+  return (
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-gray-200 p-3 shadow-lg flex items-center justify-center gap-3 md:hidden">
+      <PdfDownloadButton
+        templateRef={templateRef}
+        order={order}
+        onSuccess={onSuccess}
+        className="flex-1 py-2 text-xs"
+      />
+      <ShareToWhatsAppButton
+        templateRef={templateRef}
+        order={order}
+        className="flex-1 py-2 text-xs"
+      />
+    </div>
+  );
+};
