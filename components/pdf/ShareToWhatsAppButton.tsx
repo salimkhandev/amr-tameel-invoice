@@ -26,7 +26,30 @@ export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
       setIsProcessing(true);
 
       // Get the HTML content from the template
-      const htmlContent = templateRef.current.outerHTML;
+      let htmlContent = templateRef.current.outerHTML;
+      
+      // Convert images to base64 data URLs
+      const images = templateRef.current.querySelectorAll('img');
+      for (const img of Array.from(images)) {
+        const src = img.getAttribute('src');
+        if (src && !src.startsWith('data:')) {
+          try {
+            const response = await fetch(src);
+            const blob = await response.blob();
+            const reader = new FileReader();
+            await new Promise((resolve, reject) => {
+              reader.onload = resolve;
+              reader.onerror = reject;
+              reader.readAsDataURL(blob);
+            });
+            const base64 = reader.result as string;
+            htmlContent = htmlContent.replace(src, base64);
+          } catch (error) {
+            console.error('Failed to convert image to base64:', src, error);
+          }
+        }
+      }
+      
       const cleanDate = order.deliveryDate ? order.deliveryDate.replace(/[/\\?%*:|"<>]/g, '-') : 'date';
       const filename = `delivery-order-${order.invoiceNumber}-${cleanDate}.pdf`;
 

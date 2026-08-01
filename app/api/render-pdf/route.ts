@@ -84,7 +84,11 @@ export async function POST(req: Request) {
       ? await (
           await import("puppeteer-core")
         ).default.launch({
-          args: chromium.args,
+          args: [
+            ...chromium.args,
+            '--disable-web-security',
+            '--allow-file-access-from-files',
+          ],
           executablePath: await chromium.executablePath(
             "https://github.com/Sparticuz/chromium/releases/download/v133.0.0/chromium-v133.0.0-pack.tar",
           ),
@@ -94,7 +98,7 @@ export async function POST(req: Request) {
           await import("puppeteer")
         ).default.launch({
           headless: true,
-          args: ["--no-sandbox", "--disable-setuid-sandbox"],
+          args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-web-security", "--allow-file-access-from-files"],
           executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
         });
     
