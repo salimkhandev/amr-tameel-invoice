@@ -71,13 +71,13 @@ function OrderEditorContent() {
                 <ArrowRight className="w-5 h-5" />
               </Link>
               <div className="flex flex-col">
-                <h1 className="font-bold text-gray-900 text-base">
+                <h1 className="font-bold text-gray-900 text-sm sm:text-base">
                   Delivery Order #{order.invoiceNumber}
                 </h1>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 hidden md:flex">
               <PdfDownloadButton templateRef={templateRef} order={order} />
               <ShareToWhatsAppButton templateRef={templateRef} order={order} />
             </div>

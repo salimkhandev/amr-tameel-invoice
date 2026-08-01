@@ -20,10 +20,11 @@ export default function DashboardPage() {
             <div className="flex items-center gap-3">
               <Link
                 href="/order/new"
-                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#204978] hover:bg-[#18365a] text-white font-bold rounded-lg shadow text-sm transition-all"
+                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#204978] hover:bg-[#18365a] text-white font-bold rounded-lg shadow text-sm transition-all w-full sm:w-auto"
               >
                 <PlusCircle className="w-5 h-5" />
-                <span>Create New Delivery Order</span>
+                <span className="hidden sm:inline">Create New Delivery Order</span>
+                <span className="sm:hidden">New Order</span>
               </Link>
             </div>
           </div>
@@ -31,8 +32,8 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left Column: Welcome Message */}
             <div className="lg:col-span-2 flex flex-col gap-4">
-              <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                <h2 className="font-bold text-lg text-[#204978] mb-3">
+              <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200 shadow-sm">
+                <h2 className="font-bold text-base sm:text-lg text-[#204978] mb-3">
                   Welcome to Delivery Order System
                 </h2>
                 <p className="text-sm text-gray-600 mb-4">

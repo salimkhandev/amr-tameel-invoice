@@ -280,25 +280,27 @@ export const UserManagementPanel: React.FC = () => {
   }
 
   return (
-    <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-      <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
+    <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-gray-100">
         <div className="flex items-center gap-2">
           <Shield className="w-5 h-5 text-[#204978]" />
-          <h3 className="font-bold text-lg text-[#204978]">User Management</h3>
+          <h3 className="font-bold text-base sm:text-lg text-[#204978]">User Management</h3>
         </div>
-        <div className="text-xs text-gray-500">
-          Seed users (like default admin) are hidden
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+          <div className="text-xs text-gray-500">
+            Seed users (like default admin) are hidden
+          </div>
+          <button
+            onClick={() => {
+              setShowAddModal(true);
+              setCurrentStep(1);
+            }}
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-[#204978] hover:bg-[#18365a] text-white text-sm font-bold rounded-lg transition-colors w-full sm:w-auto"
+          >
+            <UserPlus className="w-4 h-4" />
+            <span>Add User</span>
+          </button>
         </div>
-        <button
-          onClick={() => {
-            setShowAddModal(true);
-            setCurrentStep(1);
-          }}
-          className="flex items-center gap-2 px-4 py-2 bg-[#204978] hover:bg-[#18365a] text-white text-sm font-bold rounded-lg transition-colors"
-        >
-          <UserPlus className="w-4 h-4" />
-          <span>Add User</span>
-        </button>
       </div>
 
       {isLoading ? (
@@ -314,21 +316,21 @@ export const UserManagementPanel: React.FC = () => {
           {users.map((user) => (
             <div
               key={user.id}
-              className="flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-colors"
+              className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-colors"
             >
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-[#204978] text-white flex items-center justify-center font-bold">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#204978] text-white flex items-center justify-center font-bold flex-shrink-0">
                   {user.username.charAt(0).toUpperCase()}
                 </div>
-                <div>
-                  <div className="font-semibold text-gray-900">{user.username}</div>
-                  <div className="text-xs text-gray-500">
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold text-gray-900 truncate">{user.username}</div>
+                  <div className="text-xs text-gray-500 truncate">
                     {user.full_name || 'No name'}
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span
                   className={`px-2 py-1 text-xs font-bold rounded-full ${
                     user.role === 'admin'
@@ -345,12 +347,11 @@ export const UserManagementPanel: React.FC = () => {
                       : 'bg-red-100 text-red-700'
                   }`}
                 >
-                  {user.is_active ? <Unlock className="w-3 h-3 inline" /> : <Lock className="w-3 h-3 inline" />}
                   {user.is_active ? 'Active' : 'Inactive'}
                 </span>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 self-end sm:self-auto">
                 <button
                   onClick={() => openEditModal(user)}
                   className="p-2 text-gray-600 hover:text-[#204978] hover:bg-blue-50 rounded transition-colors"
@@ -374,9 +375,9 @@ export const UserManagementPanel: React.FC = () => {
       {/* Multi-step Add User Modal */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 font-cairo">
-          <div className="bg-white w-full max-w-md rounded-xl shadow-xl border border-gray-100 overflow-hidden">
-            <div className="bg-[#204978] text-white px-4 py-3 flex justify-between items-center">
-              <h3 className="font-bold text-lg">Add New User</h3>
+          <div className="bg-white w-full max-w-md rounded-xl shadow-xl border border-gray-100 overflow-hidden max-h-[90vh] flex flex-col">
+            <div className="bg-[#204978] text-white px-4 py-3 flex justify-between items-center flex-shrink-0">
+              <h3 className="font-bold text-base sm:text-lg">Add New User</h3>
               <button
                 onClick={() => {
                   setShowAddModal(false);
@@ -390,32 +391,32 @@ export const UserManagementPanel: React.FC = () => {
             </div>
 
             {/* Progress Steps */}
-            <div className="px-6 py-4 bg-gray-50 border-b border-gray-100">
-              <div className="flex items-center justify-between">
-                <div className={`flex items-center gap-2 ${currentStep >= 1 ? 'text-[#204978]' : 'text-gray-400'}`}>
-                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${currentStep >= 1 ? 'bg-[#204978] text-white' : 'bg-gray-200'}`}>
+            <div className="px-4 sm:px-6 py-4 bg-gray-50 border-b border-gray-100 flex-shrink-0">
+              <div className="flex items-center justify-between gap-1">
+                <div className={`flex items-center gap-1 sm:gap-2 ${currentStep >= 1 ? 'text-[#204978]' : 'text-gray-400'}`}>
+                  <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-xs font-bold ${currentStep >= 1 ? 'bg-[#204978] text-white' : 'bg-gray-200'}`}>
                     1
                   </div>
-                  <span className="text-xs font-semibold">Name</span>
+                  <span className="text-[10px] sm:text-xs font-semibold hidden sm:inline">Name</span>
                 </div>
-                <div className={`flex-1 h-1 mx-2 ${currentStep >= 2 ? 'bg-[#204978]' : 'bg-gray-200'}`}></div>
-                <div className={`flex items-center gap-2 ${currentStep >= 2 ? 'text-[#204978]' : 'text-gray-400'}`}>
-                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${currentStep >= 2 ? 'bg-[#204978] text-white' : 'bg-gray-200'}`}>
+                <div className={`flex-1 h-1 mx-1 sm:mx-2 ${currentStep >= 2 ? 'bg-[#204978]' : 'bg-gray-200'}`}></div>
+                <div className={`flex items-center gap-1 sm:gap-2 ${currentStep >= 2 ? 'text-[#204978]' : 'text-gray-400'}`}>
+                  <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-xs font-bold ${currentStep >= 2 ? 'bg-[#204978] text-white' : 'bg-gray-200'}`}>
                     2
                   </div>
-                  <span className="text-xs font-semibold">Credentials</span>
+                  <span className="text-[10px] sm:text-xs font-semibold hidden sm:inline">Credentials</span>
                 </div>
-                <div className={`flex-1 h-1 mx-2 ${currentStep >= 3 ? 'bg-[#204978]' : 'bg-gray-200'}`}></div>
-                <div className={`flex items-center gap-2 ${currentStep >= 3 ? 'text-[#204978]' : 'text-gray-400'}`}>
-                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${currentStep >= 3 ? 'bg-[#204978] text-white' : 'bg-gray-200'}`}>
+                <div className={`flex-1 h-1 mx-1 sm:mx-2 ${currentStep >= 3 ? 'bg-[#204978]' : 'bg-gray-200'}`}></div>
+                <div className={`flex items-center gap-1 sm:gap-2 ${currentStep >= 3 ? 'text-[#204978]' : 'text-gray-400'}`}>
+                  <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-xs font-bold ${currentStep >= 3 ? 'bg-[#204978] text-white' : 'bg-gray-200'}`}>
                     3
                   </div>
-                  <span className="text-xs font-semibold">Role</span>
+                  <span className="text-[10px] sm:text-xs font-semibold hidden sm:inline">Role</span>
                 </div>
               </div>
             </div>
 
-            <form onSubmit={handleAddUser} className="p-6 space-y-4">
+            <form onSubmit={handleAddUser} className="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
               {/* Step 1: Full Name */}
               {currentStep === 1 && (
                 <div className="space-y-4">
@@ -529,17 +530,17 @@ export const UserManagementPanel: React.FC = () => {
       {/* Edit User Modal */}
       {showEditModal && selectedUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 font-cairo">
-          <div className="bg-white w-full max-w-md rounded-xl shadow-xl border border-gray-100 overflow-hidden">
-            <div className="bg-[#204978] text-white px-4 py-3 flex justify-between items-center">
-              <h3 className="font-bold text-lg">Edit User: {selectedUser.username}</h3>
+          <div className="bg-white w-full max-w-md rounded-xl shadow-xl border border-gray-100 overflow-hidden max-h-[90vh] flex flex-col">
+            <div className="bg-[#204978] text-white px-4 py-3 flex justify-between items-center flex-shrink-0">
+              <h3 className="font-bold text-base sm:text-lg truncate">Edit: {selectedUser.username}</h3>
               <button
                 onClick={() => setShowEditModal(false)}
-                className="p-1 text-white/80 hover:text-white rounded hover:bg-white/10"
+                className="p-1 text-white/80 hover:text-white rounded hover:bg-white/10 flex-shrink-0"
               >
                 ×
               </button>
             </div>
-            <form onSubmit={handleUpdateUser} className="p-6 space-y-4">
+            <form onSubmit={handleUpdateUser} className="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">Full Name</label>
                 <input

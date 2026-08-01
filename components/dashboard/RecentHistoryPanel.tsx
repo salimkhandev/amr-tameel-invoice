@@ -39,7 +39,7 @@ export const RecentHistoryPanel: React.FC = () => {
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 font-cairo">
       <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-100 text-[#204978]">
         <History className="w-5 h-5" />
-        <h3 className="font-bold text-base">Recent 5 Downloaded Invoices (IndexedDB)</h3>
+        <h3 className="font-bold text-sm sm:text-base">Recent 5 Downloaded Invoices</h3>
       </div>
 
       {isLoading ? (
@@ -53,14 +53,14 @@ export const RecentHistoryPanel: React.FC = () => {
           {history.map((entry) => (
             <div
               key={entry.id + entry.createdAt}
-              className="flex justify-between items-center p-3 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 text-xs transition-colors"
+              className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 text-xs transition-colors"
             >
-              <div className="flex flex-col gap-1">
-                <span className="font-bold text-gray-800">
+              <div className="flex flex-col gap-1 flex-1 min-w-0">
+                <span className="font-bold text-gray-800 truncate">
                   Order #: #{entry.invoiceNumber}
                 </span>
-                <div className="flex items-center gap-3 text-[11px] text-gray-500">
-                  <span>Delivery Date: {entry.deliveryDate}</span>
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[11px] text-gray-500">
+                  <span>Delivery: {entry.deliveryDate}</span>
                   <span className="flex items-center gap-1">
                     <Clock className="w-3 h-3" />
                     {new Date(entry.createdAt).toLocaleTimeString('en-US', {
@@ -73,10 +73,11 @@ export const RecentHistoryPanel: React.FC = () => {
 
               <button
                 onClick={() => handleDownloadBlob(entry)}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#204978] hover:bg-[#18365a] text-white rounded text-xs font-bold transition-colors"
+                className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-[#204978] hover:bg-[#18365a] text-white rounded text-xs font-bold transition-colors self-start sm:self-auto"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span>Download PDF</span>
+                <span className="hidden sm:inline">Download PDF</span>
+                <span className="sm:hidden">Download</span>
               </button>
             </div>
           ))}
