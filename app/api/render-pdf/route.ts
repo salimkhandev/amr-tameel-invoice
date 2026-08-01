@@ -112,14 +112,14 @@ export async function POST(req: Request) {
     const htmlDocument = buildHtmlDocument(html, css);
     console.log("HTML document built, length:", htmlDocument.length);
     
-    // Set content and wait for all resources to load
+    // Set content and wait for DOM to be ready
     await page.setContent(htmlDocument, {
-      waitUntil: ["load", "networkidle0", "domcontentloaded"],
+      waitUntil: ["domcontentloaded"],
     });
     console.log("Page content set");
 
-    // Add a longer delay to ensure fonts are fully loaded and rendered
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    // Short delay to ensure fonts are loaded
+    await new Promise(resolve => setTimeout(resolve, 500));
     console.log("Wait timeout completed");
 
     const pdfBuffer = await page.pdf({
