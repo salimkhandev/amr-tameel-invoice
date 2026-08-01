@@ -7,8 +7,8 @@ export const CURRENT_SCHEMA_VERSION = 1;
 export const DEFAULT_DELIVERY_ORDER: Omit<DeliveryOrder, 'id' | 'createdAt' | 'updatedAt'> = {
   schemaVersion: CURRENT_SCHEMA_VERSION,
   invoiceNumber: '00669',
-  receiptDate: '2026-05-20',
-  deliveryDate: '2026-05-25',
+  receiptDate: '20-05-2026',
+  deliveryDate: '25-05-2026',
   company: {
     nameAr: 'شركة ليونة للتجارة',
     addressAr: '٢١٨١ حي العزيزية بحرة',
@@ -16,7 +16,7 @@ export const DEFAULT_DELIVERY_ORDER: Omit<DeliveryOrder, 'id' | 'createdAt' | 'u
     logoDataUrl: './amar-logo.png',
   },
   car: {
-    plateNumber: 'ب ط و 6318',
+    plateNumber: 'ب ط 6318',
     owner: 'شركة ليونة للتجارة',
     idNumber: '7002526817',
   },
@@ -31,7 +31,7 @@ export const DEFAULT_DELIVERY_ORDER: Omit<DeliveryOrder, 'id' | 'createdAt' | 'u
     orderNo: '001',
   },
   driver: {
-    name: 'محمدخان',
+    name: 'محمد خان',
     iqamaNumber: '2309163413',
     mobile: '0547777963',
   },
