@@ -37,7 +37,7 @@ export const DEFAULT_DELIVERY_ORDER: Omit<DeliveryOrder, 'id' | 'createdAt' | 'u
   },
   load: {
     type: 'خزانات',
-    weight: '12تن',
+    weight: '12طن',
   },
 };
 
