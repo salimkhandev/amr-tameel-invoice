@@ -22,7 +22,6 @@ async function createAdminUser() {
   // Default admin credentials
   const adminUsername = 'admin';
   const adminPassword = 'admin123';
-  const adminEmail = 'admin@example.com';
   const adminFullName = 'Admin User';
 
   try {
@@ -45,15 +44,15 @@ async function createAdminUser() {
     if (checkResult.rows.length > 0) {
       console.log('Admin user already exists. Updating password...');
       await client.query(
-        'UPDATE users SET password_hash = $1, email = $2, full_name = $3 WHERE username = $4',
-        [passwordHash, adminEmail, adminFullName, adminUsername]
+        'UPDATE users SET password_hash = $1, full_name = $2 WHERE username = $3',
+        [passwordHash, adminFullName, adminUsername]
       );
       console.log('Admin user updated successfully!');
     } else {
       console.log('Creating new admin user...');
       await client.query(
-        'INSERT INTO users (username, password_hash, email, full_name, role, is_active) VALUES ($1, $2, $3, $4, $5, $6)',
-        [adminUsername, passwordHash, adminEmail, adminFullName, 'admin', true]
+        'INSERT INTO users (username, password_hash, full_name, role, is_active) VALUES ($1, $2, $3, $4, $5)',
+        [adminUsername, passwordHash, adminFullName, 'admin', true]
       );
       console.log('Admin user created successfully!');
     }

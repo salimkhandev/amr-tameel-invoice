@@ -3,20 +3,14 @@
  * Supports both environment variable auth and Supabase user management
  */
 
+import { User } from '@/types/user';
+
 const SESSION_KEY = 'session:active';
 const USER_KEY = 'session:user';
 const TOKEN_KEY = 'session:token';
 
 const AUTH_USERNAME = process.env.NEXT_PUBLIC_AUTH_USERNAME || 'mudassir2030';
 const AUTH_PASSWORD = process.env.NEXT_PUBLIC_AUTH_PASSWORD || 'mudassir2030';
-
-export interface User {
-  id?: string;
-  username: string;
-  email?: string;
-  full_name?: string;
-  role: string;
-}
 
 // Check if Supabase is configured
 const isSupabaseConfigured = () => {

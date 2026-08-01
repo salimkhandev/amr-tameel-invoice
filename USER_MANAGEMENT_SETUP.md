@@ -119,11 +119,12 @@ Add these secrets to your GitHub repository (Settings → Secrets and variables 
 ### 6. User Management Features
 
 **Admin Capabilities:**
-- ✅ Create new users with username, password, email, and role
-- ✅ Edit existing users (email, name, role, status, password)
+- ✅ Create new users with multi-step form (name → credentials → role)
+- ✅ Edit existing users (name, role, status, password)
 - ✅ Revoke user access by setting `is_active = false`
 - ✅ Delete users completely
 - ✅ View all users with their status
+- ✅ Email field removed for simplified user management
 
 **User Roles:**
 - `admin`: Full access to user management and all features
@@ -210,7 +211,6 @@ Add these secrets to your GitHub repository (Settings → Secrets and variables 
 - `id` (UUID, Primary Key)
 - `username` (String, Unique)
 - `password_hash` (String, Bcrypt hash)
-- `email` (String, Optional)
 - `full_name` (String, Optional)
 - `role` (String: 'admin' | 'user')
 - `is_active` (Boolean)

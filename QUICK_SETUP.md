@@ -74,12 +74,14 @@ After first login, immediately change the admin password:
 
 - ✅ User authentication with Supabase
 - ✅ Admin panel for user management
+- ✅ Multi-step user creation form (name → credentials → role)
 - ✅ JWT-based session management
 - ✅ User access revocation (deactivate users)
 - ✅ Role-based access control (admin/user)
 - ✅ GitHub Actions keep-alive workflow
 - ✅ Automatic database schema setup
 - ✅ Bcrypt password hashing
+- ✅ Email field removed for simplified user management
 
 ## 📝 Default Credentials
 

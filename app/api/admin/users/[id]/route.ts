@@ -25,7 +25,6 @@ export async function PATCH(
 
     // Prevent updating certain fields
     const allowedUpdates = {
-      email: updates.email,
       full_name: updates.full_name,
       role: updates.role,
       is_active: updates.is_active
@@ -36,11 +35,11 @@ export async function PATCH(
       allowedUpdates.password_hash = await bcrypt.hash(updates.password, 10);
     }
 
-    const { data: updatedUser, error } = await supabase
+    const { data: updatedUser, error } = await supabaseAdmin
       .from('users')
       .update(allowedUpdates)
       .eq('id', id)
-      .select('id, username, email, full_name, role, is_active, updated_at')
+      .select('id, username, full_name, role, is_active, updated_at')
       .single();
 
     if (error) {
@@ -84,7 +83,7 @@ export async function DELETE(
       );
     }
 
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('users')
       .delete()
       .eq('id', id);

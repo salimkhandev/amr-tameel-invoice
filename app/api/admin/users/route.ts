@@ -18,9 +18,9 @@ export async function GET(request: NextRequest) {
     }
 
     // Get all users
-    const { data: users, error } = await supabase
+    const { data: users, error } = await supabaseAdmin
       .from('users')
-      .select('id, username, email, full_name, role, is_active, created_at, updated_at')
+      .select('id, username, full_name, role, is_active, created_at, updated_at')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const { username, password, email, full_name, role = 'user' } = await request.json();
+    const { username, password, full_name, role = 'user' } = await request.json();
 
     if (!username || !password) {
       return NextResponse.json(
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user already exists
-    const { data: existingUser } = await supabase
+    const { data: existingUser } = await supabaseAdmin
       .from('users')
       .select('id')
       .eq('username', username)
@@ -75,17 +75,16 @@ export async function POST(request: NextRequest) {
     const password_hash = await bcrypt.hash(password, 10);
 
     // Create user
-    const { data: newUser, error } = await supabase
+    const { data: newUser, error } = await supabaseAdmin
       .from('users')
       .insert({
         username,
         password_hash,
-        email: email || null,
         full_name: full_name || null,
         role,
         is_active: true
       })
-      .select('id, username, email, full_name, role, is_active, created_at')
+      .select('id, username, full_name, role, is_active, created_at')
       .single();
 
     if (error) {

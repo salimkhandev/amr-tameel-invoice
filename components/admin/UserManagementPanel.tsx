@@ -1,12 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { UserPlus, Trash2, Edit2, Shield, User as UserIcon, Lock, Unlock } from 'lucide-react';
+import { UserPlus, Trash2, Edit2, Shield, User as UserIcon, Lock, Unlock, ArrowRight, ArrowLeft } from 'lucide-react';
 
 interface User {
   id: string;
   username: string;
-  email: string | null;
   full_name: string | null;
   role: string;
   is_active: boolean;
@@ -23,18 +22,17 @@ export const UserManagementPanel: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
 
-  // New user form state
+  // Multi-step form state
+  const [currentStep, setCurrentStep] = useState(1);
   const [newUser, setNewUser] = useState({
+    full_name: '',
     username: '',
     password: '',
-    email: '',
-    full_name: '',
     role: 'user'
   });
 
   // Edit user form state
   const [editUser, setEditUser] = useState({
-    email: '',
     full_name: '',
     role: 'user',
     is_active: true,
@@ -100,7 +98,8 @@ export const UserManagementPanel: React.FC = () => {
         if (data.success) {
           loadUsers();
           setShowAddModal(false);
-          setNewUser({ username: '', password: '', email: '', full_name: '', role: 'user' });
+          setCurrentStep(1);
+          setNewUser({ full_name: '', username: '', password: '', role: 'user' });
           alert('User created successfully');
         }
       } else {
@@ -133,7 +132,7 @@ export const UserManagementPanel: React.FC = () => {
           loadUsers();
           setShowEditModal(false);
           setSelectedUser(null);
-          setEditUser({ email: '', full_name: '', role: 'user', is_active: true, password: '' });
+          setEditUser({ full_name: '', role: 'user', is_active: true, password: '' });
           alert('User updated successfully');
         }
       } else {
@@ -174,13 +173,28 @@ export const UserManagementPanel: React.FC = () => {
   const openEditModal = (user: User) => {
     setSelectedUser(user);
     setEditUser({
-      email: user.email || '',
       full_name: user.full_name || '',
       role: user.role,
       is_active: user.is_active,
       password: ''
     });
     setShowEditModal(true);
+  };
+
+  const nextStep = () => {
+    if (currentStep === 1 && !newUser.full_name.trim()) {
+      alert('Please enter full name');
+      return;
+    }
+    if (currentStep === 2 && (!newUser.username.trim() || !newUser.password.trim())) {
+      alert('Please enter username and password');
+      return;
+    }
+    setCurrentStep(currentStep + 1);
+  };
+
+  const prevStep = () => {
+    setCurrentStep(currentStep - 1);
   };
 
   if (currentUser?.role !== 'admin') {
@@ -202,7 +216,10 @@ export const UserManagementPanel: React.FC = () => {
           <h3 className="font-bold text-lg text-[#204978]">User Management</h3>
         </div>
         <button
-          onClick={() => setShowAddModal(true)}
+          onClick={() => {
+            setShowAddModal(true);
+            setCurrentStep(1);
+          }}
           className="flex items-center gap-2 px-4 py-2 bg-[#204978] hover:bg-[#18365a] text-white text-sm font-bold rounded-lg transition-colors"
         >
           <UserPlus className="w-4 h-4" />
@@ -231,7 +248,7 @@ export const UserManagementPanel: React.FC = () => {
                 <div>
                   <div className="font-semibold text-gray-900">{user.username}</div>
                   <div className="text-xs text-gray-500">
-                    {user.full_name || 'No name'} • {user.email || 'No email'}
+                    {user.full_name || 'No name'}
                   </div>
                 </div>
               </div>
@@ -281,84 +298,156 @@ export const UserManagementPanel: React.FC = () => {
         </div>
       )}
 
-      {/* Add User Modal */}
+      {/* Multi-step Add User Modal */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 font-cairo">
           <div className="bg-white w-full max-w-md rounded-xl shadow-xl border border-gray-100 overflow-hidden">
             <div className="bg-[#204978] text-white px-4 py-3 flex justify-between items-center">
               <h3 className="font-bold text-lg">Add New User</h3>
               <button
-                onClick={() => setShowAddModal(false)}
+                onClick={() => {
+                  setShowAddModal(false);
+                  setCurrentStep(1);
+                  setNewUser({ full_name: '', username: '', password: '', role: 'user' });
+                }}
                 className="p-1 text-white/80 hover:text-white rounded hover:bg-white/10"
               >
                 ×
               </button>
             </div>
+
+            {/* Progress Steps */}
+            <div className="px-6 py-4 bg-gray-50 border-b border-gray-100">
+              <div className="flex items-center justify-between">
+                <div className={`flex items-center gap-2 ${currentStep >= 1 ? 'text-[#204978]' : 'text-gray-400'}`}>
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${currentStep >= 1 ? 'bg-[#204978] text-white' : 'bg-gray-200'}`}>
+                    1
+                  </div>
+                  <span className="text-xs font-semibold">Name</span>
+                </div>
+                <div className={`flex-1 h-1 mx-2 ${currentStep >= 2 ? 'bg-[#204978]' : 'bg-gray-200'}`}></div>
+                <div className={`flex items-center gap-2 ${currentStep >= 2 ? 'text-[#204978]' : 'text-gray-400'}`}>
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${currentStep >= 2 ? 'bg-[#204978] text-white' : 'bg-gray-200'}`}>
+                    2
+                  </div>
+                  <span className="text-xs font-semibold">Credentials</span>
+                </div>
+                <div className={`flex-1 h-1 mx-2 ${currentStep >= 3 ? 'bg-[#204978]' : 'bg-gray-200'}`}></div>
+                <div className={`flex items-center gap-2 ${currentStep >= 3 ? 'text-[#204978]' : 'text-gray-400'}`}>
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${currentStep >= 3 ? 'bg-[#204978] text-white' : 'bg-gray-200'}`}>
+                    3
+                  </div>
+                  <span className="text-xs font-semibold">Role</span>
+                </div>
+              </div>
+            </div>
+
             <form onSubmit={handleAddUser} className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Username *</label>
-                <input
-                  type="text"
-                  required
-                  value={newUser.username}
-                  onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#204978]"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Password *</label>
-                <input
-                  type="password"
-                  required
-                  value={newUser.password}
-                  onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#204978]"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Email</label>
-                <input
-                  type="email"
-                  value={newUser.email}
-                  onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#204978]"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Full Name</label>
-                <input
-                  type="text"
-                  value={newUser.full_name}
-                  onChange={(e) => setNewUser({ ...newUser, full_name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#204978]"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Role</label>
-                <select
-                  value={newUser.role}
-                  onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#204978]"
-                >
-                  <option value="user">User</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
-              <div className="flex gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowAddModal(false)}
-                  className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-lg transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 px-4 py-2 bg-[#204978] hover:bg-[#18365a] text-white font-bold rounded-lg transition-colors"
-                >
-                  Create User
-                </button>
-              </div>
+              {/* Step 1: Full Name */}
+              {currentStep === 1 && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Full Name *</label>
+                    <input
+                      type="text"
+                      required
+                      value={newUser.full_name}
+                      onChange={(e) => setNewUser({ ...newUser, full_name: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#204978]"
+                      placeholder="Enter full name"
+                    />
+                  </div>
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={nextStep}
+                      className="flex items-center gap-2 px-4 py-2 bg-[#204978] hover:bg-[#18365a] text-white font-bold rounded-lg transition-colors"
+                    >
+                      <span>Next</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 2: Username and Password */}
+              {currentStep === 2 && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Username *</label>
+                    <input
+                      type="text"
+                      required
+                      value={newUser.username}
+                      onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#204978]"
+                      placeholder="Enter username"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Password *</label>
+                    <input
+                      type="password"
+                      required
+                      value={newUser.password}
+                      onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#204978]"
+                      placeholder="Enter password"
+                    />
+                  </div>
+                  <div className="flex justify-between">
+                    <button
+                      type="button"
+                      onClick={prevStep}
+                      className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-lg transition-colors"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                      <span>Back</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={nextStep}
+                      className="flex items-center gap-2 px-4 py-2 bg-[#204978] hover:bg-[#18365a] text-white font-bold rounded-lg transition-colors"
+                    >
+                      <span>Next</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 3: Role Selection */}
+              {currentStep === 3 && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Role</label>
+                    <select
+                      value={newUser.role}
+                      onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#204978]"
+                    >
+                      <option value="user">User</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </div>
+                  <div className="flex justify-between">
+                    <button
+                      type="button"
+                      onClick={prevStep}
+                      className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-lg transition-colors"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                      <span>Back</span>
+                    </button>
+                    <button
+                      type="submit"
+                      className="flex items-center gap-2 px-4 py-2 bg-[#204978] hover:bg-[#18365a] text-white font-bold rounded-lg transition-colors"
+                    >
+                      <span>Create User</span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </form>
           </div>
         </div>
@@ -378,15 +467,6 @@ export const UserManagementPanel: React.FC = () => {
               </button>
             </div>
             <form onSubmit={handleUpdateUser} className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Email</label>
-                <input
-                  type="email"
-                  value={editUser.email}
-                  onChange={(e) => setEditUser({ ...editUser, email: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#204978]"
-                />
-              </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">Full Name</label>
                 <input
