@@ -117,22 +117,22 @@ export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
       onClick={handleShare}
       disabled={isProcessing || !isOnline}
       title={!isOnline ? 'WhatsApp sharing requires internet connection' : ''}
-      className={`flex items-center justify-center gap-2 px-5 py-2.5 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold rounded-lg shadow transition-all disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      className={`flex items-center justify-center gap-2 px-3 py-2 sm:px-5 sm:py-2.5 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold rounded-lg shadow transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base ${className}`}
     >
       {isProcessing ? (
         <>
-          <Loader2 className="w-5 h-5 animate-spin" />
-          <span className="font-cairo">Preparing share...</span>
+          <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
+          <span className="font-cairo">Preparing...</span>
         </>
       ) : !isOnline ? (
         <>
-          <WifiOff className="w-5 h-5" />
-          <span className="font-cairo text-xs">Requires internet</span>
+          <WifiOff className="w-4 h-4 sm:w-5 sm:h-5" />
+          <span className="font-cairo text-xs">Offline</span>
         </>
       ) : (
         <>
-          <Share2 className="w-5 h-5" />
-          <span className="font-cairo">Share via WhatsApp</span>
+          <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
+          <span className="font-cairo">WhatsApp</span>
         </>
       )}
     </button>

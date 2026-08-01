@@ -109,17 +109,17 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
       type="button"
       onClick={handleDownload}
       disabled={isGenerating}
-      className={`flex items-center justify-center gap-2 px-5 py-2.5 bg-[#204978] hover:bg-[#18365a] text-white font-bold rounded-lg shadow transition-all disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      className={`flex items-center justify-center gap-2 px-3 py-2 sm:px-5 sm:py-2.5 bg-[#204978] hover:bg-[#18365a] text-white font-bold rounded-lg shadow transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base ${className}`}
     >
       {isGenerating ? (
         <>
-          <Loader2 className="w-5 h-5 animate-spin" />
-          <span className="font-cairo">Generating PDF...</span>
+          <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
+          <span className="font-cairo">Generating...</span>
         </>
       ) : (
         <>
-          <Download className="w-5 h-5" />
-          <span className="font-cairo">Download PDF</span>
+          <Download className="w-4 h-4 sm:w-5 sm:h-5" />
+          <span className="font-cairo">Download</span>
         </>
       )}
     </button>
