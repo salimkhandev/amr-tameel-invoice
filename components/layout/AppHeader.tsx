@@ -6,16 +6,24 @@ import { useRouter } from 'next/navigation';
 import { useSession } from '@/hooks/useSession';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { FileText, PlusCircle, LogOut, WifiOff, Menu, X } from 'lucide-react';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
 
 export const AppHeader: React.FC = () => {
   const { logout, user } = useSession();
   const isOnline = useOnlineStatus();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const handleLogout = () => {
     logout();
     router.push('/login');
+    setMobileMenuOpen(false);
+    setShowLogoutModal(false);
+  };
+
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
     setMobileMenuOpen(false);
   };
 
@@ -58,7 +66,7 @@ export const AppHeader: React.FC = () => {
 
           {/* Desktop Logout */}
           <button
-            onClick={handleLogout}
+            onClick={handleLogoutClick}
             className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs bg-white/10 hover:bg-white/20 rounded transition-colors"
             title="Logout"
           >
@@ -105,7 +113,7 @@ export const AppHeader: React.FC = () => {
             )}
 
             <button
-              onClick={handleLogout}
+              onClick={handleLogoutClick}
               className="flex items-center gap-2 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors text-left"
             >
               <LogOut className="w-5 h-5" />
@@ -114,6 +122,18 @@ export const AppHeader: React.FC = () => {
           </nav>
         </div>
       )}
+
+      {/* Logout Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleLogout}
+        title="Confirm Logout"
+        message="Are you sure you want to logout? You will need to login again to access the system."
+        confirmText="Logout"
+        cancelText="Cancel"
+        type="warning"
+      />
     </header>
   );
 };
