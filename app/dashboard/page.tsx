@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { AuthGate } from '@/components/auth/AuthGate';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { RecentHistoryPanel } from '@/components/dashboard/RecentHistoryPanel';
+import { UserManagementPanel } from '@/components/admin/UserManagementPanel';
 import { PlusCircle } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -43,6 +44,9 @@ export default function DashboardPage() {
                   <span>Only the 5 most recent downloads are stored for quick access.</span>
                 </div>
               </div>
+
+              {/* User Management Panel */}
+              <UserManagementPanel />
             </div>
 
             {/* Right Column: Recent Invoices IndexedDB Panel */}

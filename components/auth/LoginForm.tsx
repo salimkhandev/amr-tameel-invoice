@@ -3,24 +3,27 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from '@/hooks/useSession';
-import { Lock, User, ArrowLeft } from 'lucide-react';
+import { Lock, User, ArrowLeft, Loader2 } from 'lucide-react';
 
 export const LoginForm: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const { login } = useSession();
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setIsLoading(true);
 
-    const success = login(username, password);
-    if (success) {
+    const result = await login(username, password);
+    if (result.success) {
       router.push('/dashboard');
     } else {
       setError('Invalid username or password');
+      setIsLoading(false);
     }
   };
 
@@ -46,9 +49,10 @@ export const LoginForm: React.FC = () => {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="mudassir2030"
+              placeholder="Enter username"
               required
-              className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#204978]"
+              disabled={isLoading}
+              className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#204978] disabled:opacity-50"
             />
           </div>
         </div>
@@ -61,19 +65,30 @@ export const LoginForm: React.FC = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
+              placeholder="Enter password"
               required
-              className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#204978]"
+              disabled={isLoading}
+              className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#204978] disabled:opacity-50"
             />
           </div>
         </div>
 
         <button
           type="submit"
-          className="w-full mt-2 py-3 bg-[#204978] hover:bg-[#18365a] text-white font-bold rounded-lg shadow-md transition-all flex items-center justify-center gap-2"
+          disabled={isLoading}
+          className="w-full mt-2 py-3 bg-[#204978] hover:bg-[#18365a] text-white font-bold rounded-lg shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span>Login to System</span>
-          <ArrowLeft className="w-5 h-5" />
+          {isLoading ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              <span>Logging in...</span>
+            </>
+          ) : (
+            <>
+              <span>Login to System</span>
+              <ArrowLeft className="w-5 h-5" />
+            </>
+          )}
         </button>
       </form>
     </div>
