@@ -11,17 +11,28 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Ping Supabase Project
-        if: secrets.SUPABASE_URL != '' && secrets.SUPABASE_SERVICE_ROLE_KEY != ''
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
-          curl --fail \
-            -H "apikey: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
-            "${{ secrets.SUPABASE_URL }}/rest/v1/users?limit=1"
+          if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+            curl --fail \
+              -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+              -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+              "$SUPABASE_URL/rest/v1/users?limit=1"
+          else
+            echo "Supabase secrets not set, skipping ping"
+          fi
 
       - name: Ping Health Check Endpoint
-        if: secrets.VERCEL_URL != ''
+        env:
+          VERCEL_URL: ${{ secrets.VERCEL_URL }}
         run: |
-          curl --fail ${{ secrets.VERCEL_URL }}/api/health
+          if [ -n "$VERCEL_URL" ]; then
+            curl --fail $VERCEL_URL/api/health
+          else
+            echo "Vercel URL not set, skipping ping"
+          fi
 
       - name: Keep Repo Alive
         run: |
