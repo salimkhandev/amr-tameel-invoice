@@ -13,7 +13,7 @@ export const DEFAULT_DELIVERY_ORDER: Omit<DeliveryOrder, 'id' | 'createdAt' | 'u
     nameAr: 'شركة ليونة للتجارة',
     addressAr: '٢١٨١ حي العزيزية بحرة',
     phone: '٠٥٤٧٧٧٧٩٦٣',
-    logoDataUrl: './logo.png',
+    logoDataUrl: './amar-logo.png',
   },
   car: {
     plateNumber: 'ب ط و 6318',

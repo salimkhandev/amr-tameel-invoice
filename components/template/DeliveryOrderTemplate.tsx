@@ -84,7 +84,7 @@ export const DeliveryOrderTemplate = forwardRef<HTMLDivElement, DeliveryOrderTem
                   <div className="rounded-[4px] flex flex-col items-center justify-center p-[6px]"
                     style={{ width: '130px', height: '115px' }}>
                     {/* eslint-disable-next-html-element-for-img */}
-                    <img src="/logo.png" alt="Logo" className="w-full h-full object-contain"
+                    <img src="/amar-logo.png" alt="Logo" className="w-full h-full object-contain"
                       style={{ width: '216px', height: '152px' }} />
                   </div>
                 </div>

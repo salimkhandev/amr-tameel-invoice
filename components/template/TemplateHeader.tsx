@@ -67,7 +67,7 @@ export const TemplateHeader: React.FC<TemplateHeaderProps> = ({
         >
           {/* eslint-disable-next-html-element-for-img */}
           <img
-            src="/logo.png"
+            src="/amar-logo.png"
             alt="Company Logo"
             className="w-full h-full object-contain"
             style={{ width: '216px', height: '152px' }}
