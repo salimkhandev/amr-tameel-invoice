@@ -31,12 +31,17 @@ export const AppHeader: React.FC = () => {
   return (
     <header className="w-full bg-[#204978] text-white shadow-md font-cairo border-b border-[#18365a]">
       <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-        {/* Left: Brand */}
-        <Link href="/dashboard" className="flex items-center gap-2 font-bold text-lg hover:opacity-90">
-          <FileText className="w-6 h-6 text-blue-300" />
-          <span className="hidden sm:inline">Delivery Order</span>
-          <span className="sm:hidden">DO</span>
-        </Link>
+        {/* Left: Brand & PWA Install */}
+        <div className="flex items-center gap-3">
+          <Link href="/dashboard" className="flex items-center gap-2 font-bold text-lg hover:opacity-90">
+            <FileText className="w-6 h-6 text-blue-300" />
+            <span className="hidden sm:inline">Delivery Order</span>
+            <span className="sm:hidden">DO</span>
+          </Link>
+
+          {/* PWA Install Button */}
+          <PwaInstallButton />
+        </div>
 
         {/* Right: Actions & Mobile Menu Toggle */}
         <div className="flex items-center gap-3">
@@ -74,9 +79,6 @@ export const AppHeader: React.FC = () => {
             <LogOut className="w-4 h-4" />
             <span>Logout</span>
           </button>
-
-          {/* PWA Install Button */}
-          <PwaInstallButton />
 
           {/* Mobile Menu Toggle */}
           <button
@@ -123,11 +125,6 @@ export const AppHeader: React.FC = () => {
               <LogOut className="w-5 h-5" />
               <span>Logout</span>
             </button>
-
-            {/* PWA Install Button for Mobile */}
-            <div className="px-4">
-              <PwaInstallButton />
-            </div>
           </nav>
         </div>
       )}
