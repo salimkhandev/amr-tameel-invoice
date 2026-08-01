@@ -62,13 +62,13 @@ export const WelcomeFlashScreen: React.FC<WelcomeFlashScreenProps> = ({
         {/* Logo/Icon */}
         <div className="mb-6">
           <div 
-            className="w-32 h-32 sm:w-24 sm:h-24 mx-auto rounded-2xl bg-white/10 backdrop-blur-sm border-2 border-white/20 flex items-center justify-center shadow-2xl"
+            className="w-40 h-24 sm:w-24 sm:h-24 mx-auto rounded-2xl bg-white/10 backdrop-blur-sm border-2 border-white/20 flex items-center justify-center shadow-2xl"
             style={{
               opacity: textOpacity,
               transition: 'opacity 0.5s ease-out 0.2s',
             }}
           >
-            <span className="text-2xl sm:text-5xl font-bold text-white text-center leading-tight">Amar Tameel</span>
+            <span className="text-2xl sm:text-5xl font-bold text-white text-center leading-tight px-2">Amar Tameel</span>
           </div>
         </div>
 
