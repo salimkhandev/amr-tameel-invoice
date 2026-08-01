@@ -269,14 +269,7 @@ export const UserManagementPanel: React.FC = () => {
   };
 
   if (currentUser?.role !== 'admin') {
-    return (
-      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-        <div className="flex items-center gap-2 text-gray-500">
-          <Lock className="w-5 h-5" />
-          <span>Admin access required to manage users</span>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   return (
