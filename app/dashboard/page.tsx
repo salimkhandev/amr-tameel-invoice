@@ -56,12 +56,12 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Prominent Create Invoice Button */}
+              {/* Create Invoice Button */}
               <Link
                 href="/order/new"
-                className="flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-[#204978] to-[#18365a] hover:from-[#18365a] hover:to-[#0f2440] text-white font-bold rounded-xl shadow-lg transition-all transform hover:scale-105 text-lg sm:text-xl"
+                className="flex items-center justify-center gap-2 px-4 py-3 bg-[#204978] hover:bg-[#18365a] text-white font-bold rounded-lg shadow transition-all text-sm sm:text-base"
               >
-                <PlusCircle className="w-6 h-6 sm:w-7 sm:h-7" />
+                <PlusCircle className="w-5 h-5" />
                 <span>Create New Invoice</span>
               </Link>
 
