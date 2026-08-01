@@ -50,10 +50,7 @@ export default function DashboardPage() {
                   Click "Create New Invoice" to generate a new invoice. 
                   When you download the PDF, it will be automatically saved to your recent downloads list.
                 </p>
-                <div className="flex items-center gap-2 text-xs text-gray-500">
-                  <span className="font-semibold">Note:</span>
-                  <span>Only the 5 most recent downloads are stored for quick access.</span>
-                </div>
+           
               </div>
 
               {/* Create Invoice Button */}

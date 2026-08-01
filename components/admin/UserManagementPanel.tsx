@@ -302,7 +302,6 @@ export const UserManagementPanel: React.FC = () => {
         <div className="text-center py-8 text-gray-500">
           <UserIcon className="w-12 h-12 mx-auto mb-3 text-gray-300" />
           <p>No users found. Add your first user to get started.</p>
-          <p className="text-xs text-gray-400 mt-2">Note: Seed users (like the default admin) are hidden from this list.</p>
         </div>
       ) : (
         <div className="space-y-3">
