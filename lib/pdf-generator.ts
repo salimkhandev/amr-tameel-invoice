@@ -10,38 +10,66 @@ export interface GeneratePdfResult {
 /**
  * Capture HTML element and generate high quality A4 PDF
  * Optimized for print quality with high DPI and proper scaling
+ * Includes Arabic text support improvements
  */
 export async function generatePdf(
   element: HTMLElement,
   invoiceNumber: string,
   deliveryDate: string
 ): Promise<GeneratePdfResult> {
-  // Ensure fonts are loaded before capture
+  // Ensure fonts are loaded before capture - critical for Arabic text
   if (typeof document !== 'undefined' && document.fonts) {
     await document.fonts.ready;
   }
 
+  // Force font loading by checking if our Arabic font is loaded
+  if (typeof document !== 'undefined') {
+    const testText = document.createElement('div');
+    testText.style.fontFamily = 'Cairo, sans-serif';
+    testText.style.opacity = '0';
+    testText.textContent = 'اختبار';
+    document.body.appendChild(testText);
+    await new Promise(resolve => setTimeout(resolve, 100));
+    document.body.removeChild(testText);
+  }
+
   // Calculate optimal scale with safety cap for large content
   const maxDimension = 8000; // Safe across browsers
-  const targetScale = 4; // 384 DPI equivalent - print quality
+  const targetScale = 3; // Reduced to 3 for better Arabic text rendering
   const estimatedHeight = element.scrollHeight * targetScale;
   const scale = estimatedHeight > maxDimension 
     ? maxDimension / element.scrollHeight 
     : targetScale;
 
-  // High quality settings for professional PDF output
+  // High quality settings with Arabic text support
   const canvas = await html2canvas(element, {
-    scale: scale, // Dynamic scale up to 4 (384 DPI) for sharp output
+    scale: scale, // Scale 3 for better Arabic text rendering
     useCORS: true,
     backgroundColor: '#ffffff',
     logging: false,
     allowTaint: true,
-    letterRendering: true, // Improve text rendering
-    imageTimeout: 30000, // 30 second timeout for complex rendering
+    letterRendering: false, // Disabled for better Arabic ligature support
+    imageTimeout: 30000,
     removeContainer: true,
     // Force explicit dimensions to avoid viewport issues
     windowWidth: element.scrollWidth,
     windowHeight: element.scrollHeight,
+    // Improved text rendering for Arabic
+    onclone: (clonedDoc) => {
+      const clonedElement = clonedDoc.body.querySelector('[data-html2canvas-ignore]');
+      if (clonedElement) {
+        clonedElement.remove();
+      }
+      // Force font application
+      const allElements = clonedDoc.body.getElementsByTagName('*');
+      for (let i = 0; i < allElements.length; i++) {
+        const element = allElements[i] as HTMLElement;
+        const computedStyle = window.getComputedStyle(element);
+        if (computedStyle.fontFamily) {
+          (element as HTMLElement).style.fontFamily = computedStyle.fontFamily;
+        }
+      }
+    },
   });
 
   // Use PNG for lossless quality (sharper text and QR codes)
