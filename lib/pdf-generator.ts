@@ -54,19 +54,47 @@ export async function generatePdf(
     // Force explicit dimensions to avoid viewport issues
     windowWidth: element.scrollWidth,
     windowHeight: element.scrollHeight,
+    // Preserve layout and spacing
+    scrollX: 0,
+    scrollY: 0,
     // Improved text rendering for Arabic
     onclone: (clonedDoc) => {
       const clonedElement = clonedDoc.body.querySelector('[data-html2canvas-ignore]');
       if (clonedElement) {
         clonedElement.remove();
       }
-      // Force font application
+      
+      // Ensure the cloned element has proper dimensions
+      const clonedBody = clonedDoc.body;
+      clonedBody.style.margin = '0';
+      clonedBody.style.padding = '0';
+      
+      // Force font application and preserve layout
       const allElements = clonedDoc.body.getElementsByTagName('*');
       for (let i = 0; i < allElements.length; i++) {
         const element = allElements[i] as HTMLElement;
         const computedStyle = window.getComputedStyle(element);
+        
+        // Preserve font family
         if (computedStyle.fontFamily) {
           (element as HTMLElement).style.fontFamily = computedStyle.fontFamily;
+        }
+        
+        // Preserve critical spacing properties
+        if (computedStyle.marginTop) {
+          (element as HTMLElement).style.marginTop = computedStyle.marginTop;
+        }
+        if (computedStyle.marginBottom) {
+          (element as HTMLElement).style.marginBottom = computedStyle.marginBottom;
+        }
+        if (computedStyle.paddingTop) {
+          (element as HTMLElement).style.paddingTop = computedStyle.paddingTop;
+        }
+        if (computedStyle.paddingBottom) {
+          (element as HTMLElement).style.paddingBottom = computedStyle.paddingBottom;
+        }
+        if (computedStyle.lineHeight) {
+          (element as HTMLElement).style.lineHeight = computedStyle.lineHeight;
         }
       }
     },
