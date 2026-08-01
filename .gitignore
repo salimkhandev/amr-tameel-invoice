@@ -16,6 +16,7 @@
 # next.js
 /.next/
 /out/
+/app where the full working code of the puptter is presnt/
 
 # production
 /build

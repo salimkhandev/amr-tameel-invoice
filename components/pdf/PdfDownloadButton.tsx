@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { DeliveryOrder } from '@/types/delivery-order';
-import { generatePdf } from '@/lib/pdf-generator';
 import { addInvoiceToHistory } from '@/lib/history';
 import { Download, Loader2 } from 'lucide-react';
 
@@ -27,14 +26,39 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
     try {
       setIsGenerating(true);
 
-      const { pdf, blob, filename } = await generatePdf(
-        templateRef.current,
-        order.invoiceNumber,
-        order.deliveryDate
-      );
+      // Get the HTML content from the template
+      const htmlContent = templateRef.current.outerHTML;
+      const cleanDate = order.deliveryDate ? order.deliveryDate.replace(/[/\\?%*:|"<>]/g, '-') : 'date';
+      const filename = `delivery-order-${order.invoiceNumber}-${cleanDate}.pdf`;
+
+      // Send to server-side PDF generation
+      const response = await fetch('/api/render-pdf', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          html: htmlContent,
+          filename: filename,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF');
+      }
+
+      // Get the PDF blob
+      const blob = await response.blob();
 
       // Trigger download
-      pdf.save(filename);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
 
       // Add to IndexedDB top-5 rolling history only
       await addInvoiceToHistory({

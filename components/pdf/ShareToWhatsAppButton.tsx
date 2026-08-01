@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { DeliveryOrder } from '@/types/delivery-order';
-import { generatePdf } from '@/lib/pdf-generator';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { Share2, Loader2, WifiOff } from 'lucide-react';
 
@@ -26,11 +25,29 @@ export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
     try {
       setIsProcessing(true);
 
-      const { pdf, blob, filename } = await generatePdf(
-        templateRef.current,
-        order.invoiceNumber,
-        order.deliveryDate
-      );
+      // Get the HTML content from the template
+      const htmlContent = templateRef.current.outerHTML;
+      const cleanDate = order.deliveryDate ? order.deliveryDate.replace(/[/\\?%*:|"<>]/g, '-') : 'date';
+      const filename = `delivery-order-${order.invoiceNumber}-${cleanDate}.pdf`;
+
+      // Send to server-side PDF generation
+      const response = await fetch('/api/render-pdf', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          html: htmlContent,
+          filename: filename,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF');
+      }
+
+      // Get the PDF blob
+      const blob = await response.blob();
 
       // Primary Path: Web Share API with files
       const file = new File([blob], filename, { type: 'application/pdf' });
@@ -48,7 +65,15 @@ export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
       }
 
       // Fallback Path: Download PDF + open wa.me link (without specific number for contact selection)
-      pdf.save(filename);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
       const msg = encodeURIComponent(
         `Delivery Order #${order.invoiceNumber} - PDF file attached.`
       );
