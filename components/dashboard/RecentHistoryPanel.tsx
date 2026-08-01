@@ -25,13 +25,13 @@ export const RecentHistoryPanel: React.FC = () => {
       const url = URL.createObjectURL(entry.pdfBlob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `delivery-order-${entry.invoiceNumber}-${entry.deliveryDate}.pdf`;
+      a.download = `invoice-${entry.invoiceNumber}-${entry.deliveryDate}.pdf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } else {
-      alert('No PDF file stored temporarily, please reopen the order and download it.');
+      alert('No PDF file stored temporarily, please reopen the invoice and download it.');
     }
   };
 
@@ -57,7 +57,7 @@ export const RecentHistoryPanel: React.FC = () => {
             >
               <div className="flex flex-col gap-1 flex-1 min-w-0">
                 <span className="font-bold text-gray-800 truncate">
-                  Order #: #{entry.invoiceNumber}
+                  Invoice #: #{entry.invoiceNumber}
                 </span>
                 <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[11px] text-gray-500">
                   <span>Delivery: {entry.deliveryDate}</span>

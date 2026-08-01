@@ -39,7 +39,7 @@ export default function NewOrderPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 font-cairo">
       <div className="flex flex-col items-center gap-3">
         <div className="w-8 h-8 border-4 border-[#204978] border-t-transparent rounded-full animate-spin" />
-        <span className="text-sm font-semibold text-gray-600">Preparing new order...</span>
+        <span className="text-sm font-semibold text-gray-600">Preparing new invoice...</span>
       </div>
     </div>
   );

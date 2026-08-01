@@ -47,7 +47,7 @@ export default function DashboardPage() {
                   Welcome, {user?.full_name || user?.username}!
                 </h2>
                 <p className="text-sm text-gray-600 mb-4">
-                  Click "Create New Delivery Order" to generate a new delivery order. 
+                  Click "Create New Invoice" to generate a new invoice. 
                   When you download the PDF, it will be automatically saved to your recent downloads list.
                 </p>
                 <div className="flex items-center gap-2 text-xs text-gray-500">
@@ -55,6 +55,15 @@ export default function DashboardPage() {
                   <span>Only the 5 most recent downloads are stored for quick access.</span>
                 </div>
               </div>
+
+              {/* Prominent Create Invoice Button */}
+              <Link
+                href="/order/new"
+                className="flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-[#204978] to-[#18365a] hover:from-[#18365a] hover:to-[#0f2440] text-white font-bold rounded-xl shadow-lg transition-all transform hover:scale-105 text-lg sm:text-xl"
+              >
+                <PlusCircle className="w-6 h-6 sm:w-7 sm:h-7" />
+                <span>Create New Invoice</span>
+              </Link>
 
               {/* User Management Panel - Only for admins */}
               <UserManagementPanel />

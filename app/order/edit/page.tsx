@@ -72,7 +72,7 @@ function OrderEditorContent() {
               </Link>
               <div className="flex flex-col">
                 <h1 className="font-bold text-gray-900 text-sm sm:text-base">
-                  Order #{order.invoiceNumber}
+                  Invoice #{order.invoiceNumber}
                 </h1>
               </div>
             </div>
