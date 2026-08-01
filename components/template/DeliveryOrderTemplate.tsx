@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useRef, useEffect } from 'react';
 import { DeliveryOrder, CompanyInfo } from '@/types/delivery-order';
 
 interface DeliveryOrderTemplateProps {
@@ -24,17 +24,31 @@ function E({
   type?: 'text' | 'tel' | 'number';
 }) {
   if (!onChange) return <span dir={dir} className={className}>{value}</span>;
+  
+  const inputRef = useRef<HTMLInputElement>(null);
+  
+  // Auto-grow width based on content
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.style.width = `${Math.max(inputRef.current.value.length, 1)}ch`;
+    }
+  }, [value]);
+  
   return (
     <input
+      ref={inputRef}
       type={type}
       defaultValue={value}
       dir={dir}
       onBlur={(e) => onChange(e.target.value)}
+      onChange={(e) => {
+        // Update width as user types
+        e.currentTarget.style.width = `${Math.max(e.target.value.length, 1)}ch`;
+      }}
       onKeyDown={(e) => {
         if (e.key === 'Enter') { e.preventDefault(); e.currentTarget.blur(); }
       }}
       className={`bg-transparent border-none outline-none focus:bg-blue-50 focus:ring-1 focus:ring-blue-400 rounded cursor-text ${className}`}
-      style={{ width: `${Math.max(value.length, 1)}ch` }}
     />
   );
 }
