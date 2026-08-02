@@ -16,8 +16,15 @@ export const PdfPreviewScaler: React.FC<PdfPreviewScalerProps> = ({ children }) 
 
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
     };
+
+    // Set initial zoom based on device
+    const isMobileDevice = window.innerWidth < 768;
+    if (isMobileDevice) {
+      setScale(0.5);
+    }
 
     checkMobile();
     window.addEventListener('resize', checkMobile);
