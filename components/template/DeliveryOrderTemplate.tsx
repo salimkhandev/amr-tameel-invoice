@@ -49,6 +49,7 @@ function E({
         if (e.key === 'Enter') { e.preventDefault(); e.currentTarget.blur(); }
       }}
       className={`bg-transparent border-none outline-none focus:bg-blue-50 focus:ring-1 focus:ring-blue-400 rounded cursor-text ${className}`}
+      style={{ width: `${Math.max(value.length, 1)}ch`, minWidth: '60px' }}
     />
   );
 }
@@ -291,8 +292,8 @@ export const DeliveryOrderTemplate = forwardRef<HTMLDivElement, DeliveryOrderTem
                     <div className="w-[50%] border-r border-gray-400 p-[6px] px-[10px] dir-rtl">
                       <E value={order.load.type} onChange={F ? (v) => setGroup('load', 'type', v) : undefined} dir="rtl" />
                     </div>
-                    <div className="w-[50%] p-[6px] px-[10px] dir-rtl">
-                      <E value={order.load.weight} onChange={F ? (v) => setGroup('load', 'weight', v) : undefined} dir="rtl" />
+                    <div className="w-[50%] p-[6px] px-[10px] dir-rtl overflow-visible">
+                      <E value={order.load.weight} onChange={F ? (v) => setGroup('load', 'weight', v) : undefined} dir="rtl" className="min-w-[80px]" />
                     </div>
                   </div>
                 </div>
