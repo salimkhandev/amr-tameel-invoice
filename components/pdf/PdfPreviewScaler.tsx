@@ -29,7 +29,7 @@ export const PdfPreviewScaler: React.FC<PdfPreviewScalerProps> = ({ children }) 
   };
 
   const handleZoomOut = () => {
-    setScale(prev => Math.max(prev - 0.1, 0.5));
+    setScale(prev => Math.max(prev - 0.1, 0.25));
   };
 
   const handleReset = () => {
@@ -72,7 +72,7 @@ export const PdfPreviewScaler: React.FC<PdfPreviewScalerProps> = ({ children }) 
         className="w-full overflow-auto py-2 sm:py-4"
         style={{ maxHeight: 'calc(100vh - 200px)' }}
       >
-        <div className="flex justify-center min-w-full">
+        <div className="flex justify-center" style={{ minWidth: `${A4_WIDTH * scale}px` }}>
           <div
             style={{
               width: `${A4_WIDTH}px`,
