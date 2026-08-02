@@ -26,11 +26,10 @@ function EditableSpan({
       contentEditable={!!onChange}
       suppressContentEditableWarning
       dir={dir}
-      className={`outline-none ${
-        onChange
+      className={`outline-none ${onChange
           ? 'focus:bg-blue-50 focus:ring-1 focus:ring-blue-400 rounded cursor-text'
           : ''
-      } ${className}`}
+        } ${className}`}
       onBlur={(e) => onChange?.(e.currentTarget.textContent ?? '')}
       onKeyDown={(e) => {
         if (e.key === 'Enter') {
@@ -91,28 +90,30 @@ export const TemplateHeader: React.FC<TemplateHeaderProps> = ({
             />
           </h1>
 
-          <p
+          <h1
             dir="auto"
-            className="text-[15px] font-bold text-gray-800 mt-[4px] c34120 font-cairo"
+            className="text-[20px] font-extrabold text-black mt-[4px] c34120 font-cairo"
             style={{ fontSize: '20px' }}
           >
             <EditableSpan
               value={company.addressAr}
               onChange={onCompanyChange ? (v) => onCompanyChange('addressAr', v) : undefined}
+              className="font-extrabold"
             />
-          </p>
+          </h1>
 
-          <p
+          <h1
             dir="auto"
-            className="text-[15px] font-bold text-gray-800 mt-[4px] c34212 font-cairo"
+            className="text-[20px] font-extrabold text-black mt-[4px] c34212 font-cairo"
             style={{ fontSize: '20px' }}
           >
             <EditableSpan
               value={company.phone}
               onChange={onCompanyChange ? (v) => onCompanyChange('phone', v) : undefined}
+              className="font-extrabold"
               dir="ltr"
             />
-          </p>
+          </h1>
         </div>
 
         {/* QR Code Image */}

@@ -36,7 +36,7 @@ function buildHtmlDocument(html: string, css?: string): string {
     <!-- Load Cairo font for Arabic text support -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script>try{window.tailwind={}}catch{}</script>
     <script>tailwind.config = { corePlugins: { preflight: false } };</script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -48,6 +48,7 @@ function buildHtmlDocument(html: string, css?: string): string {
       /* Force Cairo font for Arabic text support */
       body { font-family: 'Cairo', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", sans-serif; }
       * { font-family: 'Cairo', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", sans-serif; }
+      h1, .font-extrabold { font-weight: 800 !important; color: #000000 !important; }
     </style>
     ${css ? `<style>${css}</style>` : ""}
   </head>
@@ -62,10 +63,10 @@ export async function POST(req: Request) {
     console.log("PDF render request received");
     const payload = (await req.json()) as RenderPayload;
     const { html, css, filename } = payload || {};
-    
+
     console.log("HTML length:", html?.length);
     console.log("CSS length:", css?.length);
-    
+
     if (!html || typeof html !== "string") {
       console.error("Missing or invalid HTML in request");
       return new Response(JSON.stringify({ error: "Missing 'html' in body" }), {
@@ -82,36 +83,36 @@ export async function POST(req: Request) {
 
     const browser = isProd
       ? await (
-          await import("puppeteer-core")
-        ).default.launch({
-          args: [
-            ...chromium.args,
-            '--disable-web-security',
-            '--allow-file-access-from-files',
-          ],
-          executablePath: await chromium.executablePath(
-            "https://github.com/Sparticuz/chromium/releases/download/v133.0.0/chromium-v133.0.0-pack.tar",
-          ),
-          headless: true,
-        })
+        await import("puppeteer-core")
+      ).default.launch({
+        args: [
+          ...chromium.args,
+          '--disable-web-security',
+          '--allow-file-access-from-files',
+        ],
+        executablePath: await chromium.executablePath(
+          "https://github.com/Sparticuz/chromium/releases/download/v133.0.0/chromium-v133.0.0-pack.tar",
+        ),
+        headless: true,
+      })
       : await (
-          await import("puppeteer")
-        ).default.launch({
-          headless: true,
-          args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-web-security", "--allow-file-access-from-files"],
-          executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
-        });
-    
+        await import("puppeteer")
+      ).default.launch({
+        headless: true,
+        args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-web-security", "--allow-file-access-from-files"],
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+      });
+
     console.log("Browser launched successfully");
     const page = await browser.newPage();
     console.log("New page created");
-    
+
     await page.setViewport({ width: 794, height: 1123, deviceScaleFactor: 1 });
     console.log("Viewport set");
-    
+
     const htmlDocument = buildHtmlDocument(html, css);
     console.log("HTML document built, length:", htmlDocument.length);
-    
+
     // Set content and wait for DOM to be ready
     await page.setContent(htmlDocument, {
       waitUntil: ["domcontentloaded"],
@@ -138,9 +139,9 @@ export async function POST(req: Request) {
       pdfBuffer.byteOffset,
       pdfBuffer.byteOffset + pdfBuffer.byteLength,
     );
-    
+
     const safeFilename = filename?.replace(/[^a-zA-Z0-9-_\.]/g, '_') || 'invoice.pdf';
-    
+
     return new Response(arrayBuffer as unknown as BodyInit, {
       status: 200,
       headers: {

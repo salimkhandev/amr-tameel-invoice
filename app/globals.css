@@ -8,6 +8,7 @@
   .font-cairo {
     font-family: 'Cairo', sans-serif;
   }
+
   .font-roboto {
     font-family: 'Roboto', sans-serif;
   }
@@ -17,6 +18,7 @@
   0% {
     width: 0%;
   }
+
   100% {
     width: 100%;
   }

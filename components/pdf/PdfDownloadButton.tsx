@@ -26,11 +26,26 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
     try {
       setIsGenerating(true);
 
-      // Get the HTML content from the template
-      let htmlContent = templateRef.current.outerHTML;
-      
+      // Clone template DOM so we can clean up interactive inputs for PDF rendering
+      const clone = templateRef.current.cloneNode(true) as HTMLElement;
+
+      // Replace all input elements with plain spans with width: auto to prevent digit truncation
+      const inputs = clone.querySelectorAll('input');
+      inputs.forEach((input) => {
+        const span = document.createElement('span');
+        span.textContent = input.value;
+        const dirAttr = input.getAttribute('dir');
+        if (dirAttr) span.setAttribute('dir', dirAttr);
+        span.style.display = 'inline-block';
+        span.style.width = 'auto';
+        span.style.whiteSpace = 'nowrap';
+        input.parentNode?.replaceChild(span, input);
+      });
+
+      let htmlContent = clone.outerHTML;
+
       // Convert images to base64 data URLs
-      const images = templateRef.current.querySelectorAll('img');
+      const images = clone.querySelectorAll('img');
       for (const img of Array.from(images)) {
         const src = img.getAttribute('src');
         if (src && !src.startsWith('data:')) {
@@ -50,7 +65,7 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
           }
         }
       }
-      
+
       const cleanDate = order.deliveryDate ? order.deliveryDate.replace(/[/\\?%*:|"<>]/g, '-') : 'date';
       const filename = `invoice-${order.invoiceNumber}-${cleanDate}.pdf`;
 

@@ -24,18 +24,18 @@ function E({
   type?: 'text' | 'tel' | 'number';
 }) {
   if (!onChange) return <span dir={dir} className={className}>{value}</span>;
-  
+
   const inputRef = useRef<HTMLInputElement>(null);
-  
-  // Auto-grow width based on content
+
+  // Auto-grow width based on content with padding buffer to prevent glyph clipping
   useEffect(() => {
     if (inputRef.current) {
-      inputRef.current.style.width = `${Math.max(inputRef.current.value.length, 1)}ch`;
+      inputRef.current.style.width = `${Math.max(inputRef.current.value.length + 2, 2)}ch`;
     }
   }, [value]);
-  
+
   return (
-    <div 
+    <div
       className="w-full h-full flex items-center justify-center cursor-text"
       onClick={() => inputRef.current?.focus()}
     >
@@ -47,13 +47,13 @@ function E({
         onBlur={(e) => onChange(e.target.value)}
         onChange={(e) => {
           // Update width as user types
-          e.currentTarget.style.width = `${Math.max(e.target.value.length, 1)}ch`;
+          e.currentTarget.style.width = `${Math.max(e.target.value.length + 2, 2)}ch`;
         }}
         onKeyDown={(e) => {
           if (e.key === 'Enter') { e.preventDefault(); e.currentTarget.blur(); }
         }}
         className={`bg-transparent border-none outline-none focus:bg-blue-50 focus:ring-1 focus:ring-blue-400 rounded ${className}`}
-        style={{ width: `${Math.max(value.length, 1)}ch`, minWidth: '60px' }}
+        style={{ width: `${Math.max(value.length + 2, 2)}ch`, minWidth: '60px' }}
       />
     </div>
   );
@@ -118,16 +118,16 @@ export const DeliveryOrderTemplate = forwardRef<HTMLDivElement, DeliveryOrderTem
                         onChange={F ? (v) => setGroup('company', 'nameAr' as keyof CompanyInfo, v) : undefined}
                         dir="rtl" />
                     </h1>
-                    <p dir="auto" className="font-bold text-gray-800 mt-[4px] font-cairo whitespace-nowrap">
+                    <h1 dir="auto" className="font-extrabold text-black mt-[4px] font-cairo whitespace-nowrap c34120" style={{ fontSize: '20px' }}>
                       <E value={order.company.addressAr}
                         onChange={F ? (v) => setGroup('company', 'addressAr' as keyof CompanyInfo, v) : undefined}
                         dir="rtl" />
-                    </p>
-                    <p dir="rtl" className="font-bold text-gray-800 mt-[4px] font-cairo whitespace-nowrap" style={{ fontSize: '18px' }}>
+                    </h1>
+                    <h1 dir="rtl" className="font-extrabold text-black mt-[4px] font-cairo whitespace-nowrap c34212" style={{ fontSize: '20px' }}>
                       <E value={order.company.phone}
                         onChange={F ? (v) => setGroup('company', 'phone' as keyof CompanyInfo, v) : undefined}
                         dir="rtl" />
-                    </p>
+                    </h1>
                   </div>
                   {/* QR */}
                   <div className="w-[92px] h-[92px] rounded-[2px] overflow-hidden p-[2px] bg-white flex items-center justify-center flex-shrink-0">
