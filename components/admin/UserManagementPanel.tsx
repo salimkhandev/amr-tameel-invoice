@@ -280,9 +280,7 @@ export const UserManagementPanel: React.FC = () => {
           <h3 className="font-bold text-base sm:text-lg text-[#204978]">User Management</h3>
         </div>
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
-          <div className="text-xs text-gray-500">
-            Seed users (like default admin) are hidden
-          </div>
+       
           <button
             onClick={() => {
               setShowAddModal(true);
