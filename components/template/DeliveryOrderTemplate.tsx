@@ -107,7 +107,7 @@ export const DeliveryOrderTemplate = forwardRef<HTMLDivElement, DeliveryOrderTem
 
                 {/* Company Info + QR */}
                 <div className="flex items-start gap-[16px]">
-                  <div className="text-right flex flex-col justify-center pt-[2px] dir-rtl">
+                  <div className="text-right flex flex-col justify-center pt-[2px] dir-rtl overflow-visible">
                     <h1 dir="auto" className="font-extrabold text-black font-cairo" style={{ fontSize: '20px' }}>
                       <E value={order.company.nameAr}
                         onChange={F ? (v) => setGroup('company', 'nameAr' as keyof CompanyInfo, v) : undefined}
@@ -136,7 +136,7 @@ export const DeliveryOrderTemplate = forwardRef<HTMLDivElement, DeliveryOrderTem
               <div className="w-full border border-gray-400 text-[13px]">
                 <div className="flex w-full min-h-[42px]">
                   {/* Invoice Number label */}
-                  <div className="w-[210px] bg-[#f0f0f0] border-r border-gray-400 p-[6px] px-[8px] flex items-center justify-between font-bold text-gray-800">
+                  <div className="w-[210px] bg-[#f0f0f0] border-r border-gray-400 p-[6px] px-[8px] flex items-center justify-between font-bold text-gray-800 overflow-visible">
                     <span dir="auto" className="font-['Roboto',sans-serif]">Invoice Number /</span>
                     <span dir="auto" className="dir-rtl">رقم الطلب</span>
                   </div>
@@ -147,7 +147,7 @@ export const DeliveryOrderTemplate = forwardRef<HTMLDivElement, DeliveryOrderTem
                       dir="ltr" className="font-['Roboto',sans-serif]" />
                   </div>
                   {/* Receipt Date label */}
-                  <div className="w-[220px] bg-[#f0f0f0] border-r border-gray-400 p-[6px] px-[8px] flex items-center justify-between font-bold text-gray-800">
+                  <div className="w-[220px] bg-[#f0f0f0] border-r border-gray-400 p-[6px] px-[8px] flex items-center justify-between font-bold text-gray-800 overflow-visible">
                     <span dir="auto" className="font-['Roboto',sans-serif]">Reciept Date /</span>
                     <span dir="auto" className="dir-rtl">تاريخ الاستلام</span>
                   </div>
@@ -158,7 +158,7 @@ export const DeliveryOrderTemplate = forwardRef<HTMLDivElement, DeliveryOrderTem
                       dir="ltr" className="font-['Roboto',sans-serif]" />
                   </div>
                   {/* Delivery Date label */}
-                  <div className="w-[210px] bg-[#f0f0f0] border-r border-gray-400 p-[6px] px-[8px] flex items-center justify-between font-bold text-gray-800">
+                  <div className="w-[210px] bg-[#f0f0f0] border-r border-gray-400 p-[6px] px-[8px] flex items-center justify-between font-bold text-gray-800 overflow-visible">
                     <span dir="auto" className="font-['Roboto',sans-serif]">Delivery Date /</span>
                     <span dir="auto" className="dir-rtl">تاريخ التسليم</span>
                   </div>
@@ -186,10 +186,10 @@ export const DeliveryOrderTemplate = forwardRef<HTMLDivElement, DeliveryOrderTem
                   </div>
                   {/* Value Row */}
                   <div className="flex w-full font-bold text-gray-900 bg-white">
-                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] dir-rtl">
+                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] dir-rtl overflow-visible">
                       <E value={order.car.plateNumber} onChange={F ? (v) => setGroup('car', 'plateNumber', v) : undefined} dir="rtl" />
                     </div>
-                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] dir-rtl">
+                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] dir-rtl overflow-visible">
                       <E value={order.car.owner} onChange={F ? (v) => setGroup('car', 'owner', v) : undefined} dir="rtl" />
                     </div>
                     <div className="w-[33.33%] p-[6px] px-[10px] font-['Roboto',sans-serif]">
@@ -212,10 +212,10 @@ export const DeliveryOrderTemplate = forwardRef<HTMLDivElement, DeliveryOrderTem
                     <div className="w-[33.33%] p-[6px] px-[10px] text-left font-['Roboto',sans-serif]">Receiver Mobile</div>
                   </div>
                   <div className="flex w-full font-bold text-gray-900 bg-white">
-                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] dir-rtl">
+                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] dir-rtl overflow-visible">
                       <E value={order.receiver.name} onChange={F ? (v) => setGroup('receiver', 'name', v) : undefined} dir="rtl" />
                     </div>
-                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] dir-rtl">
+                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] dir-rtl overflow-visible">
                       <E value={order.receiver.address} onChange={F ? (v) => setGroup('receiver', 'address', v) : undefined} dir="rtl" />
                     </div>
                     <div className="w-[33.33%] p-[6px] px-[10px] font-['Roboto',sans-serif]">
@@ -238,10 +238,10 @@ export const DeliveryOrderTemplate = forwardRef<HTMLDivElement, DeliveryOrderTem
                     <div className="w-[33.33%] p-[6px] px-[10px] text-left font-['Roboto',sans-serif]">Order No</div>
                   </div>
                   <div className="flex w-full font-bold text-gray-900 bg-white">
-                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] dir-rtl">
+                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] dir-rtl overflow-visible">
                       <E value={order.transport.fromCity} onChange={F ? (v) => setGroup('transport', 'fromCity', v) : undefined} dir="rtl" />
                     </div>
-                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] dir-rtl">
+                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] dir-rtl overflow-visible">
                       <E value={order.transport.toCity} onChange={F ? (v) => setGroup('transport', 'toCity', v) : undefined} dir="rtl" />
                     </div>
                     <div className="w-[33.33%] p-[6px] px-[10px] font-['Roboto',sans-serif]">
@@ -264,7 +264,7 @@ export const DeliveryOrderTemplate = forwardRef<HTMLDivElement, DeliveryOrderTem
                     <div className="w-[33.33%] p-[6px] px-[10px] text-left font-['Roboto',sans-serif]">Mobile</div>
                   </div>
                   <div className="flex w-full font-bold text-gray-900 bg-white">
-                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] dir-rtl">
+                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] dir-rtl overflow-visible">
                       <E value={order.driver.name} onChange={F ? (v) => setGroup('driver', 'name', v) : undefined} dir="rtl" />
                     </div>
                     <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] font-['Roboto',sans-serif]">
@@ -289,7 +289,7 @@ export const DeliveryOrderTemplate = forwardRef<HTMLDivElement, DeliveryOrderTem
                     <div className="w-[50%] p-[6px] px-[10px] text-left font-['Roboto',sans-serif]">Goods Weight</div>
                   </div>
                   <div className="flex w-full font-bold text-gray-900 bg-white">
-                    <div className="w-[50%] border-r border-gray-400 p-[6px] px-[10px] dir-rtl">
+                    <div className="w-[50%] border-r border-gray-400 p-[6px] px-[10px] dir-rtl overflow-visible">
                       <E value={order.load.type} onChange={F ? (v) => setGroup('load', 'type', v) : undefined} dir="rtl" />
                     </div>
                     <div className="w-[50%] p-[6px] px-[10px] dir-rtl overflow-visible">
