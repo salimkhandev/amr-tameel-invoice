@@ -17,12 +17,30 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
+    // Get current user to check if they are seed admin
+    const { data: currentUser, error: userError } = await supabaseAdmin
+      .from('users')
+      .select('id, username, is_seed')
+      .eq('username', payload.username)
+      .single();
+
+    if (userError || !currentUser) {
+      return NextResponse.json({ error: 'Failed to verify current user' }, { status: 500 });
+    }
+
     // Get all users (excluding seed users)
-    const { data: users, error } = await supabaseAdmin
+    let query = supabaseAdmin
       .from('users')
       .select('id, username, full_name, role, is_active, is_seed, created_at, updated_at')
       .eq('is_seed', false)
       .order('created_at', { ascending: false });
+
+    // If current user is NOT seed admin, filter out themselves from the list
+    if (!currentUser.is_seed) {
+      query = query.neq('id', currentUser.id);
+    }
+
+    const { data: users, error } = await query;
 
     if (error) {
       return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
