@@ -85,7 +85,7 @@ function OrderEditorContent() {
         </div>
 
         {/* WYSIWYG — A4 template is the editor */}
-        <main className="flex-1 flex flex-col items-center py-2 sm:py-6 pb-24">
+        <main className="flex-1 flex flex-col items-center py-0 sm:py-6 pb-24">
           <PdfPreviewScaler>
             {/* onOrderChange enables inline editing directly on the template */}
             <DeliveryOrderTemplate

@@ -35,22 +35,27 @@ function E({
   }, [value]);
   
   return (
-    <input
-      ref={inputRef}
-      type={type}
-      defaultValue={value}
-      dir={dir}
-      onBlur={(e) => onChange(e.target.value)}
-      onChange={(e) => {
-        // Update width as user types
-        e.currentTarget.style.width = `${Math.max(e.target.value.length, 1)}ch`;
-      }}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter') { e.preventDefault(); e.currentTarget.blur(); }
-      }}
-      className={`bg-transparent border-none outline-none focus:bg-blue-50 focus:ring-1 focus:ring-blue-400 rounded cursor-text ${className}`}
-      style={{ width: `${Math.max(value.length, 1)}ch`, minWidth: '60px' }}
-    />
+    <div 
+      className="w-full h-full flex items-center justify-center cursor-text"
+      onClick={() => inputRef.current?.focus()}
+    >
+      <input
+        ref={inputRef}
+        type={type}
+        defaultValue={value}
+        dir={dir}
+        onBlur={(e) => onChange(e.target.value)}
+        onChange={(e) => {
+          // Update width as user types
+          e.currentTarget.style.width = `${Math.max(e.target.value.length, 1)}ch`;
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') { e.preventDefault(); e.currentTarget.blur(); }
+        }}
+        className={`bg-transparent border-none outline-none focus:bg-blue-50 focus:ring-1 focus:ring-blue-400 rounded ${className}`}
+        style={{ width: `${Math.max(value.length, 1)}ch`, minWidth: '60px' }}
+      />
+    </div>
   );
 }
 
@@ -108,24 +113,24 @@ export const DeliveryOrderTemplate = forwardRef<HTMLDivElement, DeliveryOrderTem
                 {/* Company Info + QR */}
                 <div className="flex items-start gap-[16px]">
                   <div className="text-right flex flex-col justify-center pt-[2px] dir-rtl overflow-visible">
-                    <h1 dir="auto" className="font-extrabold text-black font-cairo" style={{ fontSize: '20px' }}>
+                    <h1 dir="auto" className="font-extrabold text-black font-cairo whitespace-nowrap" style={{ fontSize: '20px' }}>
                       <E value={order.company.nameAr}
                         onChange={F ? (v) => setGroup('company', 'nameAr' as keyof CompanyInfo, v) : undefined}
                         dir="rtl" />
                     </h1>
-                    <p dir="auto" className="font-bold text-gray-800 mt-[4px] font-cairo" style={{ fontSize: '20px' }}>
+                    <p dir="auto" className="font-bold text-gray-800 mt-[4px] font-cairo whitespace-nowrap">
                       <E value={order.company.addressAr}
                         onChange={F ? (v) => setGroup('company', 'addressAr' as keyof CompanyInfo, v) : undefined}
                         dir="rtl" />
                     </p>
-                    <p dir="auto" className="font-bold text-gray-800 mt-[4px] font-cairo" style={{ fontSize: '20px' }}>
+                    <p dir="rtl" className="font-bold text-gray-800 mt-[4px] font-cairo whitespace-nowrap" style={{ fontSize: '18px' }}>
                       <E value={order.company.phone}
                         onChange={F ? (v) => setGroup('company', 'phone' as keyof CompanyInfo, v) : undefined}
-                        dir="ltr" />
+                        dir="rtl" />
                     </p>
                   </div>
                   {/* QR */}
-                  <div className="w-[92px] h-[92px] rounded-[2px] overflow-hidden p-[2px] bg-white flex items-center justify-center">
+                  <div className="w-[92px] h-[92px] rounded-[2px] overflow-hidden p-[2px] bg-white flex items-center justify-center flex-shrink-0">
                     {/* eslint-disable-next-html-element-for-img */}
                     <img src="/qr-code.png" alt="QR Code" className="w-full h-full object-cover" />
                   </div>
@@ -137,7 +142,7 @@ export const DeliveryOrderTemplate = forwardRef<HTMLDivElement, DeliveryOrderTem
                 <div className="flex w-full min-h-[42px]">
                   {/* Invoice Number label */}
                   <div className="w-[210px] bg-[#f0f0f0] border-r border-gray-400 p-[6px] px-[8px] flex items-center justify-between font-bold text-gray-800 overflow-visible">
-                    <span dir="auto" className="font-['Roboto',sans-serif]">Invoice Number /</span>
+                    <span dir="auto" className="font-['Roboto',sans-serif] whitespace-nowrap">Invoice Number /</span>
                     <span dir="auto" className="dir-rtl">رقم الطلب</span>
                   </div>
                   {/* Invoice Number value */}
@@ -148,7 +153,7 @@ export const DeliveryOrderTemplate = forwardRef<HTMLDivElement, DeliveryOrderTem
                   </div>
                   {/* Receipt Date label */}
                   <div className="w-[220px] bg-[#f0f0f0] border-r border-gray-400 p-[6px] px-[8px] flex items-center justify-between font-bold text-gray-800 overflow-visible">
-                    <span dir="auto" className="font-['Roboto',sans-serif]">Reciept Date /</span>
+                    <span dir="auto" className="font-['Roboto',sans-serif] whitespace-nowrap">Reciept Date /</span>
                     <span dir="auto" className="dir-rtl">تاريخ الاستلام</span>
                   </div>
                   {/* Receipt Date value */}
@@ -159,7 +164,7 @@ export const DeliveryOrderTemplate = forwardRef<HTMLDivElement, DeliveryOrderTem
                   </div>
                   {/* Delivery Date label */}
                   <div className="w-[210px] bg-[#f0f0f0] border-r border-gray-400 p-[6px] px-[8px] flex items-center justify-between font-bold text-gray-800 overflow-visible">
-                    <span dir="auto" className="font-['Roboto',sans-serif]">Delivery Date /</span>
+                    <span dir="auto" className="font-['Roboto',sans-serif] whitespace-nowrap">Delivery Date /</span>
                     <span dir="auto" className="dir-rtl">تاريخ التسليم</span>
                   </div>
                   {/* Delivery Date value */}
@@ -174,15 +179,15 @@ export const DeliveryOrderTemplate = forwardRef<HTMLDivElement, DeliveryOrderTem
               {/* ── SECTION 1: CAR INFORMATION ── */}
               <div className="w-full border border-gray-400">
                 <div className="bg-[#204978] text-white px-[12px] py-[5px] flex justify-between items-center text-[15px] font-bold">
-                  <span dir="auto" className="font-['Roboto',sans-serif]">Car Information</span>
+                  <span dir="auto" className="font-['Roboto',sans-serif] whitespace-nowrap">Car Information</span>
                   <span dir="auto" className="dir-rtl">معلومات المركبة</span>
                 </div>
                 <div className="w-full text-[13px]">
                   {/* Label Row */}
                   <div className="flex w-full bg-[#f0f0f0] border-b border-gray-400 font-bold text-gray-800">
-                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] text-left font-['Roboto',sans-serif]">Plate number</div>
-                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] text-left font-['Roboto',sans-serif]">Owner</div>
-                    <div className="w-[33.33%] p-[6px] px-[10px] text-left font-['Roboto',sans-serif]">ID number</div>
+                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] text-left font-['Roboto',sans-serif] whitespace-nowrap">Plate number</div>
+                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] text-left font-['Roboto',sans-serif] whitespace-nowrap">Owner</div>
+                    <div className="w-[33.33%] p-[6px] px-[10px] text-left font-['Roboto',sans-serif] whitespace-nowrap">ID number</div>
                   </div>
                   {/* Value Row */}
                   <div className="flex w-full font-bold text-gray-900 bg-white">
@@ -202,14 +207,14 @@ export const DeliveryOrderTemplate = forwardRef<HTMLDivElement, DeliveryOrderTem
               {/* ── SECTION 2: RECEIVER INFORMATION ── */}
               <div className="w-full border border-gray-400">
                 <div className="bg-[#204978] text-white px-[12px] py-[5px] flex justify-between items-center text-[15px] font-bold">
-                  <span dir="auto" className="font-['Roboto',sans-serif]">Receiver Information</span>
+                  <span dir="auto" className="font-['Roboto',sans-serif] whitespace-nowrap">Receiver Information</span>
                   <span dir="auto" className="dir-rtl">معلومات المستلم</span>
                 </div>
                 <div className="w-full text-[13px]">
                   <div className="flex w-full bg-[#f0f0f0] border-b border-gray-400 font-bold text-gray-800">
-                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] text-left font-['Roboto',sans-serif]">Receiver Name</div>
-                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] text-left font-['Roboto',sans-serif]">Receiver Address</div>
-                    <div className="w-[33.33%] p-[6px] px-[10px] text-left font-['Roboto',sans-serif]">Receiver Mobile</div>
+                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] text-left font-['Roboto',sans-serif] whitespace-nowrap">Receiver Name</div>
+                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] text-left font-['Roboto',sans-serif] whitespace-nowrap">Receiver Address</div>
+                    <div className="w-[33.33%] p-[6px] px-[10px] text-left font-['Roboto',sans-serif] whitespace-nowrap">Receiver Mobile</div>
                   </div>
                   <div className="flex w-full font-bold text-gray-900 bg-white">
                     <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] dir-rtl overflow-visible">
@@ -228,14 +233,14 @@ export const DeliveryOrderTemplate = forwardRef<HTMLDivElement, DeliveryOrderTem
               {/* ── SECTION 3: TRANSPORTATION INFORMATION ── */}
               <div className="w-full border border-gray-400">
                 <div className="bg-[#204978] text-white px-[12px] py-[5px] flex justify-between items-center text-[15px] font-bold">
-                  <span dir="auto" className="font-['Roboto',sans-serif]">Transportation Information</span>
+                  <span dir="auto" className="font-['Roboto',sans-serif] whitespace-nowrap">Transportation Information</span>
                   <span dir="auto" className="dir-rtl">معلومات النقل</span>
                 </div>
                 <div className="w-full text-[13px]">
                   <div className="flex w-full bg-[#f0f0f0] border-b border-gray-400 font-bold text-gray-800">
-                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] text-left font-['Roboto',sans-serif]">From City</div>
-                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] text-left font-['Roboto',sans-serif]">To City</div>
-                    <div className="w-[33.33%] p-[6px] px-[10px] text-left font-['Roboto',sans-serif]">Order No</div>
+                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] text-left font-['Roboto',sans-serif] whitespace-nowrap">From City</div>
+                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] text-left font-['Roboto',sans-serif] whitespace-nowrap">To City</div>
+                    <div className="w-[33.33%] p-[6px] px-[10px] text-left font-['Roboto',sans-serif] whitespace-nowrap">Order No</div>
                   </div>
                   <div className="flex w-full font-bold text-gray-900 bg-white">
                     <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] dir-rtl overflow-visible">
@@ -254,14 +259,14 @@ export const DeliveryOrderTemplate = forwardRef<HTMLDivElement, DeliveryOrderTem
               {/* ── SECTION 4: DRIVER INFORMATION ── */}
               <div className="w-full border border-gray-400">
                 <div className="bg-[#204978] text-white px-[12px] py-[5px] flex justify-between items-center text-[15px] font-bold">
-                  <span dir="auto" className="font-['Roboto',sans-serif]">Driver Information</span>
+                  <span dir="auto" className="font-['Roboto',sans-serif] whitespace-nowrap">Driver Information</span>
                   <span dir="auto" className="dir-rtl">معلومات السائق</span>
                 </div>
                 <div className="w-full text-[13px]">
                   <div className="flex w-full bg-[#f0f0f0] border-b border-gray-400 font-bold text-gray-800">
-                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] text-left font-['Roboto',sans-serif]">Name</div>
-                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] text-left font-['Roboto',sans-serif]">Iqama Number</div>
-                    <div className="w-[33.33%] p-[6px] px-[10px] text-left font-['Roboto',sans-serif]">Mobile</div>
+                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] text-left font-['Roboto',sans-serif] whitespace-nowrap">Name</div>
+                    <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] text-left font-['Roboto',sans-serif] whitespace-nowrap">Iqama Number</div>
+                    <div className="w-[33.33%] p-[6px] px-[10px] text-left font-['Roboto',sans-serif] whitespace-nowrap">Mobile</div>
                   </div>
                   <div className="flex w-full font-bold text-gray-900 bg-white">
                     <div className="w-[33.33%] border-r border-gray-400 p-[6px] px-[10px] dir-rtl overflow-visible">
@@ -280,13 +285,13 @@ export const DeliveryOrderTemplate = forwardRef<HTMLDivElement, DeliveryOrderTem
               {/* ── SECTION 5: LOAD INFORMATION ── */}
               <div className="w-full border border-gray-400">
                 <div className="bg-[#204978] text-white px-[12px] py-[5px] flex justify-between items-center text-[15px] font-bold">
-                  <span dir="auto" className="font-['Roboto',sans-serif]">Load Information</span>
+                  <span dir="auto" className="font-['Roboto',sans-serif] whitespace-nowrap">Load Information</span>
                   <span dir="auto" className="dir-rtl">معلومات الحمولة</span>
                 </div>
                 <div className="w-full text-[13px]">
                   <div className="flex w-full bg-[#f0f0f0] border-b border-gray-400 font-bold text-gray-800">
-                    <div className="w-[50%] border-r border-gray-400 p-[6px] px-[10px] text-left font-['Roboto',sans-serif]">Load Type</div>
-                    <div className="w-[50%] p-[6px] px-[10px] text-left font-['Roboto',sans-serif]">Goods Weight</div>
+                    <div className="w-[50%] border-r border-gray-400 p-[6px] px-[10px] text-left font-['Roboto',sans-serif] whitespace-nowrap">Load Type</div>
+                    <div className="w-[50%] p-[6px] px-[10px] text-left font-['Roboto',sans-serif] whitespace-nowrap">Goods Weight</div>
                   </div>
                   <div className="flex w-full font-bold text-gray-900 bg-white">
                     <div className="w-[50%] border-r border-gray-400 p-[6px] px-[10px] dir-rtl overflow-visible">

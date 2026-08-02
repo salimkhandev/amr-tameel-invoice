@@ -13,14 +13,20 @@ export default function NewOrderPage() {
   useEffect(() => {
     const newId = generateOrderId();
     const now = new Date().toISOString();
-    const todayFormatted = new Date().toISOString().split('T')[0];
+    const today = new Date();
+    const todayFormatted = today.toISOString().split('T')[0];
+    
+    // Calculate receipt date (5 days from today)
+    const receiptDate = new Date(today);
+    receiptDate.setDate(receiptDate.getDate() + 5);
+    const receiptDateFormatted = receiptDate.toISOString().split('T')[0];
 
     const newOrder: DeliveryOrder = {
       ...DEFAULT_DELIVERY_ORDER,
       id: newId,
       createdAt: now,
       updatedAt: now,
-      receiptDate: todayFormatted,
+      receiptDate: receiptDateFormatted,
       deliveryDate: todayFormatted,
     };
 
