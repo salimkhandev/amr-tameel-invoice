@@ -149,9 +149,7 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
         }
       });
 
-      let htmlContent = clone.outerHTML;
-
-      // Convert images to base64 data URLs (including the verified QR code)
+      // Convert images to base64 data URLs BEFORE getting outerHTML
       const images = clone.querySelectorAll('img');
       console.log('Processing images for base64 conversion:', images.length);
       
@@ -178,14 +176,19 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
             });
             const base64 = reader.result as string;
             console.log('Base64 length:', base64.length);
-            htmlContent = htmlContent.replace(src, base64);
-            console.log('Successfully converted:', src);
+            
+            // Update the img element's src attribute BEFORE getting outerHTML
+            img.setAttribute('src', base64);
+            console.log('Successfully converted and updated img src:', src);
           } catch (error) {
             console.error('Failed to convert image to base64:', src, error);
             // Don't throw - continue with other images
           }
         }
       }
+
+      // Now get the HTML content with all images converted to base64
+      let htmlContent = clone.outerHTML;
 
       const cleanDate = order.deliveryDate ? order.deliveryDate.replace(/[/\\?%*:|"<>]/g, '-') : 'date';
       const filename = `invoice-${order.invoiceNumber}-${cleanDate}.pdf`;
