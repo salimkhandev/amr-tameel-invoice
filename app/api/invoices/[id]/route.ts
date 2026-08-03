@@ -95,7 +95,13 @@ export async function PATCH(
       );
     }
 
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabase = createClient(supabaseUrl, supabaseKey, {
+      global: {
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      }
+    });
 
     // Check if invoice exists first
     const { data: existingInvoice, error: checkError } = await supabase

@@ -31,7 +31,13 @@ export async function GET(
       );
     }
 
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabase = createClient(supabaseUrl, supabaseKey, {
+      global: {
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      }
+    });
 
     // Fetch invoice from Supabase
     const { data: invoice, error: fetchError } = await supabase
