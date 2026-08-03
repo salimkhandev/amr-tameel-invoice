@@ -247,34 +247,55 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
         console.error('Failed to add to history:', historyError);
       }
 
-      // Store invoice in Supabase
+      // Store invoice in Supabase - THIS IS CRITICAL FOR QR CODE TO WORK
+      console.log('═══════════════════════════════════════════════════');
+      console.log('SAVING TO SUPABASE - Invoice ID:', order.id);
+      console.log('Status:', status);
+      console.log('Customer URL:', customerUrl);
+      console.log('═══════════════════════════════════════════════════');
+      
       try {
+        const supabasePayload = {
+          id: order.id,
+          order_data: order,
+          status: status,
+          qr_data: {
+            qrCodeUrl: customerUrl || '',
+            encryptedInvoiceId: encryptedId || '',
+          },
+        };
+        
+        console.log('Supabase payload:', JSON.stringify(supabasePayload, null, 2));
+        
         const supabaseResponse = await fetch('/api/invoices', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            id: order.id,
-            order_data: order,
-            status: 'In Transit',
-            qr_data: {
-              qrCodeUrl: customerUrl || '',
-              encryptedInvoiceId: encryptedId || '',
-            },
-          }),
+          body: JSON.stringify(supabasePayload),
         });
 
+        console.log('Supabase API response status:', supabaseResponse.status, supabaseResponse.statusText);
+        
         const supabaseData = await supabaseResponse.json();
         console.log('Supabase storage response:', supabaseData);
 
         if (!supabaseResponse.ok) {
-          console.error('Failed to store in Supabase:', supabaseData.error);
+          console.error('❌ FAILED TO STORE IN SUPABASE:', supabaseData.error);
+          console.error('Response:', supabaseData);
+          // Show error to user if Supabase storage fails
+          alert(`CRITICAL: Invoice was downloaded but FAILED to save to database!\n\nThe QR code will NOT work!\n\nError: ${supabaseData.error || 'Unknown error'}\n\nPlease try downloading again or contact support.`);
+          throw new Error('Failed to save invoice to database');
         } else {
-          console.log('Successfully stored invoice in Supabase');
+          console.log('✅ SUCCESS: Invoice stored in Supabase');
+          console.log('Invoice ID:', order.id);
+          console.log('Status:', status);
+          console.log('QR Code will work for customer URL:', customerUrl);
         }
       } catch (supabaseError) {
-        console.error('Failed to store in Supabase:', supabaseError);
+        console.error('❌ EXCEPTION during Supabase storage:', supabaseError);
+        alert(`CRITICAL: Invoice was downloaded but FAILED to save to database!\n\nThe QR code will NOT work!\n\nError: ${supabaseError}\n\nPlease check your internet connection and try again.`);
+        throw supabaseError;
       }
 
       if (onSuccess) {
