@@ -5,19 +5,19 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { invoiceId: string } }
+  { params }: { params: { encryptedId: string } }
 ) {
   try {
-    const { invoiceId } = params;
+    const { encryptedId } = params;
 
-    if (!invoiceId) {
+    if (!encryptedId) {
       return NextResponse.json(
         { error: 'Missing invoice ID' },
         { status: 400 }
       );
     }
 
-    console.log('Fetching invoice for invoiceId:', invoiceId);
+    console.log('Fetching invoice for invoiceId:', encryptedId);
 
     // Initialize Supabase client
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -37,7 +37,7 @@ export async function GET(
     const { data: invoice, error: fetchError } = await supabase
       .from('invoices')
       .select('*')
-      .eq('id', invoiceId)
+      .eq('id', encryptedId)
       .single();
 
     if (fetchError) {
@@ -49,9 +49,9 @@ export async function GET(
     }
 
     if (!invoice) {
-      console.error('Invoice not found in database for ID:', invoiceId);
+      console.error('Invoice not found in database for ID:', encryptedId);
       return NextResponse.json(
-        { error: 'Invoice not found', invoiceId },
+        { error: 'Invoice not found', invoiceId: encryptedId },
         { status: 404 }
       );
     }
