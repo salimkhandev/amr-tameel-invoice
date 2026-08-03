@@ -17,10 +17,6 @@ import {
   XCircle
 } from 'lucide-react';
 
-// Force dynamic rendering - never cache this page
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-
 export default function CustomerInvoicePage() {
   const params = useParams();
   const encryptedId = params.encryptedId as string;
