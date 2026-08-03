@@ -13,8 +13,14 @@
     font-family: 'Roboto', sans-serif;
   }
 
-  .browser-hidden {
+  .hide-in-browser {
     display: none;
+  }
+
+  @media print {
+    .hide-in-browser {
+      display: flex !important;
+    }
   }
 }
 
