@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { OrderHistoryEntry, InvoiceStatus } from '@/types/delivery-order';
-import { getRecentInvoices, updateInvoiceStatus } from '@/lib/history';
+import { getRecentInvoices, updateInvoiceStatus, fetchInvoiceStatusFromSupabase } from '@/lib/history';
 import { History, Download, Clock, Edit } from 'lucide-react';
 
 export const RecentHistoryPanel: React.FC = () => {
@@ -10,11 +10,24 @@ export const RecentHistoryPanel: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<OrderHistoryEntry | null>(null);
+  const [statuses, setStatuses] = useState<Record<string, InvoiceStatus>>({});
 
   const loadHistory = async () => {
     setIsLoading(true);
     const data = await getRecentInvoices();
     setHistory(data);
+    
+    // Fetch status for each invoice from Supabase
+    const statusMap: Record<string, InvoiceStatus> = {};
+    await Promise.all(
+      data.map(async (entry) => {
+        const status = await fetchInvoiceStatusFromSupabase(entry.id);
+        if (status) {
+          statusMap[entry.id] = status;
+        }
+      })
+    );
+    setStatuses(statusMap);
     setIsLoading(false);
   };
 
@@ -42,10 +55,7 @@ export const RecentHistoryPanel: React.FC = () => {
 
     console.log('Updating status for invoice:', selectedInvoice.id, 'to:', newStatus);
 
-    // Update IndexedDB
-    const success = await updateInvoiceStatus(selectedInvoice.id, newStatus);
-    
-    // Update Supabase
+    // Update Supabase first
     try {
       const response = await fetch(`/api/invoices/${selectedInvoice.id}`, {
         method: 'PATCH',
@@ -61,20 +71,21 @@ export const RecentHistoryPanel: React.FC = () => {
       if (!response.ok) {
         console.error('Failed to update Supabase status:', data.error);
         alert('Failed to update status in database: ' + (data.error || 'Unknown error'));
-      } else {
-        console.log('Successfully updated status in Supabase');
+        return;
       }
-    } catch (supabaseError) {
-      console.error('Failed to update Supabase status:', supabaseError);
-      alert('Failed to update status in database. Please check your connection.');
-    }
 
-    if (success) {
+      console.log('Successfully updated status in Supabase');
+      
+      // Update local status state immediately for UI responsiveness
+      setStatuses(prev => ({ ...prev, [selectedInvoice.id]: newStatus }));
+      
+      // Reload history to refresh statuses
       await loadHistory();
       setShowStatusModal(false);
       setSelectedInvoice(null);
-    } else {
-      alert('Failed to update invoice status locally');
+    } catch (supabaseError) {
+      console.error('Failed to update Supabase status:', supabaseError);
+      alert('Failed to update status in database. Please check your connection.');
     }
   };
 
@@ -122,8 +133,8 @@ export const RecentHistoryPanel: React.FC = () => {
                   <span className="font-bold text-gray-800 truncate">
                     Invoice #: #{entry.invoiceNumber}
                   </span>
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${getStatusColor(entry.status)}`}>
-                    {entry.status}
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${getStatusColor(statuses[entry.id] || 'In Transit')}`}>
+                    {statuses[entry.id] || 'In Transit'}
                   </span>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[11px] text-gray-500">
@@ -177,7 +188,7 @@ export const RecentHistoryPanel: React.FC = () => {
                   key={status}
                   onClick={() => handleStatusUpdate(status)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    selectedInvoice.status === status
+                    (statuses[selectedInvoice.id] || 'In Transit') === status
                       ? 'bg-[#204978] text-white'
                       : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
                   }`}

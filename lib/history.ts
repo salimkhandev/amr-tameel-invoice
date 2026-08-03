@@ -17,10 +17,10 @@ export async function getRecentInvoices(): Promise<OrderHistoryEntry[]> {
     for (const key of historyKeys) {
       const item = await get<any>(key);
       if (item) {
-        // Ensure new fields exist for backward compatibility
+        // Ensure new fields exist for backward compatibility, but don't use stored status
         const normalizedEntry: OrderHistoryEntry = {
           ...item,
-          status: item.status || 'In Transit',
+          status: null as any, // Status will be fetched from Supabase
           qrCodeUrl: item.qrCodeUrl || '',
           encryptedInvoiceId: item.encryptedInvoiceId || '',
         };
@@ -46,10 +46,10 @@ export async function addInvoiceToHistory(entry: OrderHistoryEntry): Promise<voi
   try {
     const key = `${HISTORY_KEY_PREFIX}${entry.id}`;
     
-    // Ensure required fields are present
+    // Ensure required fields are present, but don't store status
     const normalizedEntry: OrderHistoryEntry = {
       ...entry,
-      status: entry.status || 'In Transit',
+      status: null as any, // Don't store status in IndexedDB
       qrCodeUrl: entry.qrCodeUrl || '',
       encryptedInvoiceId: entry.encryptedInvoiceId || '',
     };
@@ -78,7 +78,27 @@ export async function addInvoiceToHistory(entry: OrderHistoryEntry): Promise<voi
 }
 
 /**
- * Update invoice status
+ * Fetch invoice status from Supabase
+ */
+export async function fetchInvoiceStatusFromSupabase(invoiceId: string): Promise<InvoiceStatus | null> {
+  if (typeof window === 'undefined') return null;
+  try {
+    const response = await fetch(`/api/invoices/${invoiceId}`);
+    if (!response.ok) {
+      console.error('Failed to fetch invoice status from Supabase:', response.status);
+      return null;
+    }
+    const data = await response.json();
+    return data.invoice?.status || null;
+  } catch (err) {
+    console.error('Failed to fetch invoice status:', err);
+    return null;
+  }
+}
+
+/**
+ * Update invoice status in IndexedDB only (for UI consistency during updates)
+ * Note: This is temporary - actual status should come from Supabase
  */
 export async function updateInvoiceStatus(invoiceId: string, newStatus: InvoiceStatus): Promise<boolean> {
   if (typeof window === 'undefined') return false;
