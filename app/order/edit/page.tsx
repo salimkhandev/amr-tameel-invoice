@@ -78,7 +78,7 @@ function OrderEditorContent() {
             </div>
 
             <div className="flex items-center gap-2 hidden md:flex">
-              <PdfDownloadButton templateRef={templateRef} order={order} />
+              <PdfDownloadButton templateRef={templateRef} order={order} status="In Transit" />
               <ShareToWhatsAppButton templateRef={templateRef} order={order} />
             </div>
           </div>
@@ -96,7 +96,7 @@ function OrderEditorContent() {
           </PdfPreviewScaler>
         </main>
 
-        <BottomActionBar templateRef={templateRef} order={order} />
+        <BottomActionBar templateRef={templateRef} order={order} status="In Transit" />
       </div>
     </AuthGate>
   );

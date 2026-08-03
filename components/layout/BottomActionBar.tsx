@@ -8,12 +8,14 @@ import { ShareToWhatsAppButton } from '@/components/pdf/ShareToWhatsAppButton';
 interface BottomActionBarProps {
   templateRef: React.RefObject<HTMLDivElement | null>;
   order: DeliveryOrder;
+  status?: string;
   onSuccess?: () => void;
 }
 
 export const BottomActionBar: React.FC<BottomActionBarProps> = ({
   templateRef,
   order,
+  status = 'In Transit',
   onSuccess,
 }) => {
   return (
@@ -21,6 +23,7 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
       <PdfDownloadButton
         templateRef={templateRef}
         order={order}
+        status={status as any}
         onSuccess={onSuccess}
         className="flex-1 py-2 text-xs"
       />

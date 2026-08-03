@@ -8,6 +8,7 @@ import { Download, Loader2 } from 'lucide-react';
 interface PdfDownloadButtonProps {
   templateRef: React.RefObject<HTMLDivElement | null>;
   order: DeliveryOrder;
+  status: InvoiceStatus;
   onSuccess?: () => void;
   className?: string;
 }
@@ -15,6 +16,7 @@ interface PdfDownloadButtonProps {
 export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
   templateRef,
   order,
+  status,
   onSuccess,
   className = '',
 }) => {
@@ -68,7 +70,7 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
           },
           body: JSON.stringify({
             order: order,
-            status: 'In Transit'
+            status: status,
           }),
         });
 
@@ -205,7 +207,7 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
           createdAt: new Date().toISOString(),
           order: order,
           pdfBlob: blob,
-          status: 'In Transit' as InvoiceStatus,
+          status: status,
           qrCodeUrl: customerUrl || '',
           encryptedInvoiceId: encryptedId || '',
         });
