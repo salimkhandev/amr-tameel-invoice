@@ -21,17 +21,92 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
   className = '',
 }) => {
   const [isGenerating, setIsGenerating] = useState(false);
+  const [loadingStage, setLoadingStage] = useState<'qr' | 'pdf' | null>(null);
 
   const handleDownload = async () => {
     if (!templateRef.current || isGenerating) return;
 
     try {
       setIsGenerating(true);
+      
+      // ═══════════════════════════════════════════════════════════
+      // STAGE 1: Generate and verify QR code
+      // ═══════════════════════════════════════════════════════════
+      setLoadingStage('qr');
+      console.log('Stage 1: Generating QR code...');
 
-      // Clone template DOM so we can clean up interactive inputs for PDF rendering
+      // Generate QR code components via server API
+      let qrCodeUrl = '';
+      let encryptedId = '';
+      let customerUrl = '';
+      
+      try {
+        const qrResponse = await fetch('/api/generate-qr', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            order: order,
+            status: status,
+          }),
+        });
+
+        if (!qrResponse.ok) {
+          throw new Error(`QR generation API failed: ${qrResponse.status}`);
+        }
+
+        const qrData = await qrResponse.json();
+        qrCodeUrl = qrData.qrCodeUrl;
+        encryptedId = qrData.encryptedId;
+        customerUrl = qrData.customerUrl;
+        console.log('QR code URL generated:', customerUrl);
+      } catch (qrError) {
+        console.error('QR code generation failed:', qrError);
+        throw new Error('Failed to generate QR code. Please try again.');
+      }
+
+      // Pre-load and verify QR code image before proceeding
+      console.log('Verifying QR code image loads...');
+      await new Promise<void>((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+          console.log('QR code image verified loaded successfully');
+          resolve();
+        };
+        img.onerror = () => {
+          console.error('QR code image failed to load');
+          reject(new Error('QR code image failed to load'));
+        };
+        img.src = qrCodeUrl;
+        
+        // Timeout after 10 seconds
+        setTimeout(() => reject(new Error('QR code image load timeout')), 10000);
+      });
+
+      // ═══════════════════════════════════════════════════════════
+      // STAGE 2: Prepare DOM and generate PDF
+      // ═══════════════════════════════════════════════════════════
+      setLoadingStage('pdf');
+      console.log('Stage 2: Generating PDF...');
+
+      // Clone template DOM
       const clone = templateRef.current.cloneNode(true) as HTMLElement;
 
-      // Replace all input elements with plain spans with width: auto to prevent digit truncation
+      // Show QR code in PDF - use off-screen positioning instead of display:none
+      const qrContainer = clone.querySelector('#qr-code') as HTMLElement;
+      if (qrContainer) {
+        // Make visible with inline styles (CSS backup still applies)
+        qrContainer.style.display = 'flex';
+        qrContainer.style.visibility = 'visible';
+        qrContainer.style.opacity = '1';
+        console.log('QR container made visible with inline styles');
+      } else {
+        console.error('QR container not found in clone');
+        throw new Error('QR container not found in template');
+      }
+
+      // Replace all input elements with plain spans
       const inputs = clone.querySelectorAll('input');
       inputs.forEach((input) => {
         const span = document.createElement('span');
@@ -44,77 +119,42 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
         input.parentNode?.replaceChild(span, input);
       });
 
-      // Generate QR code components via server API to avoid client-side JWT issues
-      let qrCodeUrl = '/qr-code.png'; // fallback to static QR code
-      let encryptedId = '';
-      let customerUrl = '';
-      
-      try {
-        console.log('Requesting QR code generation from server...');
-        const qrResponse = await fetch('/api/generate-qr', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            order: order,
-            status: status,
-          }),
-        });
-
-        if (qrResponse.ok) {
-          const qrData = await qrResponse.json();
-          qrCodeUrl = qrData.qrCodeUrl;
-          encryptedId = qrData.encryptedId;
-          customerUrl = qrData.customerUrl;
-          console.log('QR code generated successfully:', customerUrl);
-        } else {
-          console.error('QR generation API failed:', qrResponse.status);
-        }
-      } catch (qrError) {
-        console.error('QR code generation failed:', qrError);
-        // Continue with static QR code if generation fails
-      }
-
-      // Replace static QR code with dynamic one (or fallback)
+      // Replace static QR code with verified dynamic QR code
       const qrImages = clone.querySelectorAll('img[alt="QR Code"]');
       console.log('Found QR code images:', qrImages.length);
+      
+      if (qrImages.length === 0) {
+        throw new Error('QR code image element not found in template');
+      }
+
       qrImages.forEach((img) => {
         const htmlImg = img as HTMLElement;
-        const oldSrc = img.getAttribute('src');
-        console.log('Replacing QR code src from:', oldSrc, 'to:', qrCodeUrl);
+        console.log('Replacing QR code src with verified URL:', qrCodeUrl);
         img.setAttribute('src', qrCodeUrl);
-        // Also update width/height to match new QR code size
         img.setAttribute('width', '300');
         img.setAttribute('height', '300');
-        // Add force-visible-block class to image (images need display: block)
-        htmlImg.classList.add('force-visible-block');
+        
         // Force image visibility with inline styles
-        htmlImg.style.removeProperty('display');
-        htmlImg.style.setProperty('display', 'block', 'important');
-        htmlImg.style.removeProperty('visibility');
-        htmlImg.style.setProperty('visibility', 'visible', 'important');
-        htmlImg.style.removeProperty('opacity');
-        htmlImg.style.setProperty('opacity', '1', 'important');
-        // Ensure the parent container is visible
+        htmlImg.style.display = 'block';
+        htmlImg.style.visibility = 'visible';
+        htmlImg.style.opacity = '1';
+        
+        // Ensure parent container is visible
         const parent = htmlImg.parentElement;
         if (parent) {
           const htmlParent = parent as HTMLElement;
-          htmlParent.classList.add('force-visible');
-          htmlParent.style.removeProperty('display');
-          htmlParent.style.setProperty('display', 'flex', 'important');
-          htmlParent.style.removeProperty('visibility');
-          htmlParent.style.setProperty('visibility', 'visible', 'important');
-          htmlParent.style.removeProperty('opacity');
-          htmlParent.style.setProperty('opacity', '1', 'important');
+          htmlParent.style.display = 'flex';
+          htmlParent.style.visibility = 'visible';
+          htmlParent.style.opacity = '1';
         }
       });
 
       let htmlContent = clone.outerHTML;
 
-      // Convert images to base64 data URLs (including the new QR code)
+      // Convert images to base64 data URLs (including the verified QR code)
       const images = clone.querySelectorAll('img');
       console.log('Processing images for base64 conversion:', images.length);
+      
       for (const img of Array.from(images)) {
         const src = img.getAttribute('src');
         if (src && !src.startsWith('data:')) {
@@ -142,6 +182,7 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
             console.log('Successfully converted:', src);
           } catch (error) {
             console.error('Failed to convert image to base64:', src, error);
+            // Don't throw - continue with other images
           }
         }
       }
@@ -150,7 +191,7 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
       const filename = `invoice-${order.invoiceNumber}-${cleanDate}.pdf`;
 
       // Send to server-side PDF generation
-      console.log('Sending PDF generation request...');
+      console.log('Sending PDF generation request to Puppeteer...');
       const response = await fetch('/api/render-pdf', {
         method: 'POST',
         headers: {
@@ -171,7 +212,6 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
       }
 
       console.log('Getting PDF blob...');
-      // Get the PDF blob
       const blob = await response.blob();
       console.log('PDF blob received, size:', blob.size, 'type:', blob.type);
 
@@ -186,7 +226,7 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
       document.body.removeChild(a);
 
       console.log('Adding to history with QR data...');
-      // Add to IndexedDB top-5 rolling history with new fields
+      // Add to IndexedDB history
       try {
         await addInvoiceToHistory({
           id: order.id,
@@ -202,10 +242,9 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
         console.log('Successfully added to history');
       } catch (historyError) {
         console.error('Failed to add to history:', historyError);
-        // Don't fail the download if history storage fails
       }
 
-      // Store invoice in Supabase for customer access
+      // Store invoice in Supabase
       try {
         const supabaseResponse = await fetch('/api/invoices', {
           method: 'POST',
@@ -233,7 +272,6 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
         }
       } catch (supabaseError) {
         console.error('Failed to store in Supabase:', supabaseError);
-        // Don't fail the download if Supabase storage fails
       }
 
       if (onSuccess) {
@@ -245,6 +283,7 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
       alert(`An error occurred while downloading the invoice: ${errorMessage}. Please try again.`);
     } finally {
       setIsGenerating(false);
+      setLoadingStage(null);
     }
   };
 
@@ -258,7 +297,9 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
       {isGenerating ? (
         <>
           <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
-          <span className="font-cairo">Generating...</span>
+          <span className="font-cairo">
+            {loadingStage === 'qr' ? 'Generating QR code...' : 'Generating PDF...'}
+          </span>
         </>
       ) : (
         <>
