@@ -1,5 +1,5 @@
 import { get, set, del, keys } from 'idb-keyval';
-import { OrderHistoryEntry } from '@/types/delivery-order';
+import { OrderHistoryEntry, InvoiceStatus } from '@/types/delivery-order';
 
 const HISTORY_KEY_PREFIX = 'history_invoice_';
 const MAX_HISTORY_ITEMS = 5;
@@ -15,9 +15,16 @@ export async function getRecentInvoices(): Promise<OrderHistoryEntry[]> {
     
     const entries: OrderHistoryEntry[] = [];
     for (const key of historyKeys) {
-      const item = await get<OrderHistoryEntry>(key);
+      const item = await get<any>(key);
       if (item) {
-        entries.push(item);
+        // Ensure new fields exist for backward compatibility
+        const normalizedEntry: OrderHistoryEntry = {
+          ...item,
+          status: item.status || 'In Transit',
+          qrCodeUrl: item.qrCodeUrl || '',
+          encryptedInvoiceId: item.encryptedInvoiceId || '',
+        };
+        entries.push(normalizedEntry);
       }
     }
 
@@ -39,10 +46,18 @@ export async function addInvoiceToHistory(entry: OrderHistoryEntry): Promise<voi
   try {
     const key = `${HISTORY_KEY_PREFIX}${entry.id}`;
     
+    // Ensure required fields are present
+    const normalizedEntry: OrderHistoryEntry = {
+      ...entry,
+      status: entry.status || 'In Transit',
+      qrCodeUrl: entry.qrCodeUrl || '',
+      encryptedInvoiceId: entry.encryptedInvoiceId || '',
+    };
+    
     // Check if item already exists (update in place)
-    const existing = await get<OrderHistoryEntry>(key);
+    const existing = await get<any>(key);
     if (existing) {
-      await set(key, { ...entry, createdAt: new Date().toISOString() });
+      await set(key, { ...normalizedEntry, createdAt: new Date().toISOString() });
       return;
     }
 
@@ -56,9 +71,47 @@ export async function addInvoiceToHistory(entry: OrderHistoryEntry): Promise<voi
       }
     }
 
-    await set(key, { ...entry, createdAt: new Date().toISOString() });
+    await set(key, { ...normalizedEntry, createdAt: new Date().toISOString() });
   } catch (err) {
     console.error('Failed to add invoice to history in IndexedDB:', err);
+  }
+}
+
+/**
+ * Update invoice status
+ */
+export async function updateInvoiceStatus(invoiceId: string, newStatus: InvoiceStatus): Promise<boolean> {
+  if (typeof window === 'undefined') return false;
+  try {
+    const key = `${HISTORY_KEY_PREFIX}${invoiceId}`;
+    const existing = await get<any>(key);
+    
+    if (existing) {
+      const updated: OrderHistoryEntry = {
+        ...existing,
+        status: newStatus,
+      };
+      await set(key, updated);
+      return true;
+    }
+    return false;
+  } catch (err) {
+    console.error('Failed to update invoice status:', err);
+    return false;
+  }
+}
+
+/**
+ * Get invoice by encrypted ID
+ */
+export async function getInvoiceByEncryptedId(encryptedId: string): Promise<OrderHistoryEntry | null> {
+  if (typeof window === 'undefined') return null;
+  try {
+    const allInvoices = await getRecentInvoices();
+    return allInvoices.find(invoice => invoice.encryptedInvoiceId === encryptedId) || null;
+  } catch (err) {
+    console.error('Failed to get invoice by encrypted ID:', err);
+    return null;
   }
 }
 

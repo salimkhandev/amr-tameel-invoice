@@ -49,6 +49,8 @@ function buildHtmlDocument(html: string, css?: string): string {
       body { font-family: 'Cairo', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", sans-serif; }
       * { font-family: 'Cairo', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", sans-serif; }
       h1, .font-extrabold { font-weight: 800 !important; color: #000000 !important; }
+      /* Show QR code in PDF but hide in browser */
+      .hidden-pdf-only { display: block !important; }
     </style>
     ${css ? `<style>${css}</style>` : ""}
   </head>

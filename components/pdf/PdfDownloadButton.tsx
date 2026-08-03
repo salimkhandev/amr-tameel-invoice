@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { DeliveryOrder } from '@/types/delivery-order';
+import { DeliveryOrder, InvoiceStatus } from '@/types/delivery-order';
 import { addInvoiceToHistory } from '@/lib/history';
 import { Download, Loader2 } from 'lucide-react';
 
@@ -29,6 +29,12 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
       // Clone template DOM so we can clean up interactive inputs for PDF rendering
       const clone = templateRef.current.cloneNode(true) as HTMLElement;
 
+      // Show QR code in PDF (hidden in browser)
+      const qrContainer = clone.querySelector('#qr-code') as HTMLElement;
+      if (qrContainer) {
+        qrContainer.style.display = 'flex';
+      }
+
       // Replace all input elements with plain spans with width: auto to prevent digit truncation
       const inputs = clone.querySelectorAll('input');
       inputs.forEach((input) => {
@@ -42,14 +48,56 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
         input.parentNode?.replaceChild(span, input);
       });
 
+      // Generate QR code components via server API to avoid client-side JWT issues
+      let qrCodeUrl = '/qr-code.png'; // fallback to static QR code
+      let encryptedId = '';
+      let customerUrl = '';
+      
+      try {
+        console.log('Requesting QR code generation from server...');
+        const qrResponse = await fetch('/api/generate-qr', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            order: order,
+            status: 'In Transit'
+          }),
+        });
+
+        if (qrResponse.ok) {
+          const qrData = await qrResponse.json();
+          qrCodeUrl = qrData.qrCodeUrl;
+          encryptedId = qrData.encryptedId;
+          customerUrl = qrData.customerUrl;
+          console.log('QR code generated successfully:', customerUrl);
+        } else {
+          console.error('QR generation API failed:', qrResponse.status);
+        }
+      } catch (qrError) {
+        console.error('QR code generation failed:', qrError);
+        // Continue with static QR code if generation fails
+      }
+
+      // Replace static QR code with dynamic one (or fallback)
+      const qrImages = clone.querySelectorAll('img[alt="QR Code"]');
+      console.log('Found QR code images:', qrImages.length);
+      qrImages.forEach((img) => {
+        console.log('Replacing QR code src from:', img.getAttribute('src'), 'to:', qrCodeUrl);
+        img.setAttribute('src', qrCodeUrl);
+      });
+
       let htmlContent = clone.outerHTML;
 
-      // Convert images to base64 data URLs
+      // Convert images to base64 data URLs (including the new QR code)
       const images = clone.querySelectorAll('img');
+      console.log('Processing images for base64 conversion:', images.length);
       for (const img of Array.from(images)) {
         const src = img.getAttribute('src');
         if (src && !src.startsWith('data:')) {
           try {
+            console.log('Converting image to base64:', src);
             const response = await fetch(src);
             const blob = await response.blob();
             const reader = new FileReader();
@@ -60,6 +108,7 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
             });
             const base64 = reader.result as string;
             htmlContent = htmlContent.replace(src, base64);
+            console.log('Successfully converted:', src);
           } catch (error) {
             console.error('Failed to convert image to base64:', src, error);
           }
@@ -70,6 +119,7 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
       const filename = `invoice-${order.invoiceNumber}-${cleanDate}.pdf`;
 
       // Send to server-side PDF generation
+      console.log('Sending PDF generation request...');
       const response = await fetch('/api/render-pdf', {
         method: 'POST',
         headers: {
@@ -81,12 +131,18 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
         }),
       });
 
+      console.log('Response status:', response.status, response.statusText);
+      
       if (!response.ok) {
-        throw new Error('Failed to generate PDF');
+        const errorText = await response.text();
+        console.error('PDF generation failed:', errorText);
+        throw new Error(`Failed to generate PDF: ${response.status} ${response.statusText}`);
       }
 
+      console.log('Getting PDF blob...');
       // Get the PDF blob
       const blob = await response.blob();
+      console.log('PDF blob received, size:', blob.size, 'type:', blob.type);
 
       // Trigger download
       const url = window.URL.createObjectURL(blob);
@@ -98,22 +154,33 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
 
-      // Add to IndexedDB top-5 rolling history only
-      await addInvoiceToHistory({
-        id: order.id,
-        invoiceNumber: order.invoiceNumber,
-        deliveryDate: order.deliveryDate,
-        createdAt: new Date().toISOString(),
-        order: order,
-        pdfBlob: blob,
-      });
+      console.log('Adding to history with QR data...');
+      // Add to IndexedDB top-5 rolling history with new fields
+      try {
+        await addInvoiceToHistory({
+          id: order.id,
+          invoiceNumber: order.invoiceNumber,
+          deliveryDate: order.deliveryDate,
+          createdAt: new Date().toISOString(),
+          order: order,
+          pdfBlob: blob,
+          status: 'In Transit' as InvoiceStatus,
+          qrCodeUrl: customerUrl || '',
+          encryptedInvoiceId: encryptedId || '',
+        });
+        console.log('Successfully added to history');
+      } catch (historyError) {
+        console.error('Failed to add to history:', historyError);
+        // Don't fail the download if history storage fails
+      }
 
       if (onSuccess) {
         onSuccess();
       }
     } catch (err) {
       console.error('PDF Generation failed:', err);
-      alert('An error occurred while downloading the invoice, please try again.');
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+      alert(`An error occurred while downloading the invoice: ${errorMessage}. Please try again.`);
     } finally {
       setIsGenerating(false);
     }

@@ -1,3 +1,5 @@
+export type InvoiceStatus = 'In Transit' | 'Sent' | 'Delivered' | 'Failed' | 'Cancelled';
+
 export interface CompanyInfo {
   nameAr: string;
   addressAr: string;
@@ -57,4 +59,7 @@ export interface OrderHistoryEntry {
   createdAt: string;
   order: DeliveryOrder;
   pdfBlob?: Blob;
+  status: InvoiceStatus;
+  qrCodeUrl: string;
+  encryptedInvoiceId: string;
 }
