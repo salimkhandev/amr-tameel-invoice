@@ -33,7 +33,7 @@ export default function CustomerInvoicePage() {
 
         // Add timestamp to bust cache - ensures fresh data on every load
         const timestamp = Date.now();
-        const response = await fetch(`/api/customer/invoice/${encryptedId}?t=${timestamp}`, {
+        const response = await fetch(`/api/invoices/${encryptedId}?t=${timestamp}`, {
           cache: 'no-store',
           headers: {
             'Cache-Control': 'no-cache',
@@ -47,7 +47,7 @@ export default function CustomerInvoicePage() {
           return;
         }
 
-        if (!data.success || !data.invoice) {
+        if (!data.invoice) {
           setError('Invoice not found');
           return;
         }
