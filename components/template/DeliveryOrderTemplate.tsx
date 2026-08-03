@@ -130,7 +130,7 @@ export const DeliveryOrderTemplate = forwardRef<HTMLDivElement, DeliveryOrderTem
                     </h1>
                   </div>
                   {/* QR */}
-                  <div className="w-[92px] h-[92px] rounded-[2px] overflow-hidden p-[2px] bg-white flex items-center justify-center flex-shrink-0 hidden-in-browser" id="qr-code">
+                  <div className="w-[92px] h-[92px] rounded-[2px] overflow-hidden p-[2px] bg-white flex items-center justify-center flex-shrink-0" id="qr-code">
                     {/* eslint-disable-next-html-element-for-img */}
                     <img src="/qr-code.png" alt="QR Code" className="w-full h-full object-cover" />
                   </div>

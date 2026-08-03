@@ -31,8 +31,13 @@ export default function CustomerInvoicePage() {
         setLoading(true);
         setError(null);
 
-        // Fetch invoice from API
-        const response = await fetch(`/api/customer/invoice/${encryptedId}`);
+        // Fetch invoice from API with no-cache to always get fresh data
+        const response = await fetch(`/api/customer/invoice/${encryptedId}`, {
+          cache: 'no-store', // Prevent caching
+          headers: {
+            'Cache-Control': 'no-cache',
+          }
+        });
         const data = await response.json();
 
         if (!response.ok) {
