@@ -31,45 +31,26 @@ export default function CustomerInvoicePage() {
         setLoading(true);
         setError(null);
 
-        console.log('═══════════════════════════════════════════════════');
-        console.log('CUSTOMER PAGE - Loading invoice');
-        console.log('Encrypted ID from URL:', encryptedId);
-        console.log('═══════════════════════════════════════════════════');
-
-        // Fetch invoice from API with no-cache to always get fresh data
-        const apiUrl = `/api/customer/invoice/${encryptedId}`;
-        console.log('Fetching from:', apiUrl);
-        
-        const response = await fetch(apiUrl, {
-          cache: 'no-store', // Prevent caching
+        // Add timestamp to bust cache - ensures fresh data on every load
+        const timestamp = Date.now();
+        const response = await fetch(`/api/customer/invoice/${encryptedId}?t=${timestamp}`, {
+          cache: 'no-store',
           headers: {
             'Cache-Control': 'no-cache',
           }
         });
         
-        console.log('Response status:', response.status, response.statusText);
-        console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-        
         const data = await response.json();
-        console.log('Response data:', data);
 
         if (!response.ok) {
-          console.error('❌ API request failed:', data.error);
           setError(data.error || 'Failed to load invoice');
           return;
         }
 
         if (!data.success || !data.invoice) {
-          console.error('❌ No invoice in response');
           setError('Invoice not found');
           return;
         }
-
-        console.log('✅ Invoice data received from API');
-        console.log('Invoice ID:', data.invoice.id);
-        console.log('Status from API:', data.invoice.status);
-        console.log('Updated At:', data.invoice.updated_at);
-        console.log('Order Data:', data.invoice.order_data);
 
         // Transform Supabase data to match OrderHistoryEntry format
         const invoiceData: OrderHistoryEntry = {
@@ -83,13 +64,9 @@ export default function CustomerInvoicePage() {
           encryptedInvoiceId: data.invoice.qr_data?.encryptedInvoiceId || '',
         };
 
-        console.log('✅ Invoice transformed for display');
-        console.log('Display Status:', invoiceData.status);
-        console.log('═══════════════════════════════════════════════════');
-
         setInvoice(invoiceData);
       } catch (err) {
-        console.error('❌ Exception during load:', err);
+        console.error('Failed to load invoice:', err);
         setError('Failed to load invoice. Please try again later.');
       } finally {
         setLoading(false);

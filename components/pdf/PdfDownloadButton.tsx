@@ -30,10 +30,29 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
       setIsGenerating(true);
       
       // ═══════════════════════════════════════════════════════════
+      // STAGE 0: Fetch current status from Supabase (like RecentHistoryPanel)
+      // ═══════════════════════════════════════════════════════════
+      console.log('Stage 0: Fetching current status from Supabase...');
+      let currentStatus: InvoiceStatus = status;
+      
+      try {
+        const statusResponse = await fetch(`/api/invoices/${order.id}`);
+        if (statusResponse.ok) {
+          const statusData = await statusResponse.json();
+          if (statusData.invoice?.status) {
+            currentStatus = statusData.invoice.status;
+            console.log('Current status fetched from Supabase:', currentStatus);
+          }
+        }
+      } catch (statusError) {
+        console.warn('Failed to fetch current status, using provided status:', statusError);
+      }
+      
+      // ═══════════════════════════════════════════════════════════
       // STAGE 1: Generate and verify QR code
       // ═══════════════════════════════════════════════════════════
       setLoadingStage('qr');
-      console.log('Stage 1: Generating QR code...');
+      console.log('Stage 1: Generating QR code with status:', currentStatus);
 
       // Generate QR code components via server API
       let qrCodeUrl = '';
@@ -48,7 +67,7 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
           },
           body: JSON.stringify({
             order: order,
-            status: status,
+            status: currentStatus,
           }),
         });
 
@@ -238,7 +257,7 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
           createdAt: new Date().toISOString(),
           order: order,
           pdfBlob: blob,
-          status: status,
+          status: currentStatus,
           qrCodeUrl: customerUrl || '',
           encryptedInvoiceId: encryptedId || '',
         });
@@ -250,7 +269,7 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
       // Store invoice in Supabase - THIS IS CRITICAL FOR QR CODE TO WORK
       console.log('═══════════════════════════════════════════════════');
       console.log('SAVING TO SUPABASE - Invoice ID:', order.id);
-      console.log('Status:', status);
+      console.log('Status:', currentStatus);
       console.log('Customer URL:', customerUrl);
       console.log('═══════════════════════════════════════════════════');
       
@@ -258,7 +277,7 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
         const supabasePayload = {
           id: order.id,
           order_data: order,
-          status: status,
+          status: currentStatus,
           qr_data: {
             qrCodeUrl: customerUrl || '',
             encryptedInvoiceId: encryptedId || '',

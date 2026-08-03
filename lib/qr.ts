@@ -1,5 +1,6 @@
 import { DeliveryOrder, InvoiceStatus } from '@/types/delivery-order';
 import jwt from 'jsonwebtoken';
+import QRCode from 'qrcode';
 
 const QR_SECRET = process.env.QR_SECRET || 'your-qr-secret-change-in-production';
 const CUSTOMER_BASE_URL = process.env.NEXT_PUBLIC_CUSTOMER_BASE_URL || 'https://amr-tameel-invoice.vercel.app/customer/invoice';
@@ -92,10 +93,22 @@ export function generateCustomerInvoiceUrl(encryptedId: string): string {
 }
 
 /**
- * Generate QR code data URL using a third-party API
- * This avoids client-side library dependencies
+ * Generate QR code data URL using local library
+ * This avoids external API caching issues
  */
 export async function generateQrCodeUrl(data: string): Promise<string> {
-  const encodedData = encodeURIComponent(data);
-  return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodedData}&color=000000&bgcolor=ffffff`;
+  try {
+    const dataUrl = await QRCode.toDataURL(data, {
+      width: 300,
+      margin: 2,
+      color: {
+        dark: '#000000',
+        light: '#ffffff'
+      }
+    });
+    return dataUrl;
+  } catch (error) {
+    console.error('Failed to generate QR code:', error);
+    throw new Error('Failed to generate QR code');
+  }
 }
