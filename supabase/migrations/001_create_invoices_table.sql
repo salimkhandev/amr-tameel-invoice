@@ -59,6 +59,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Create trigger to run the cleanup function after each insert
+DROP TRIGGER IF EXISTS cleanup_old_invoices ON invoices;
 CREATE TRIGGER cleanup_old_invoices
 AFTER INSERT ON invoices
 FOR EACH ROW
