@@ -2,8 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { verifyEncryptedInvoiceId } from '@/lib/qr';
-import { getInvoiceByEncryptedId } from '@/lib/history';
 import { OrderHistoryEntry } from '@/types/delivery-order';
 import { 
   Package, 
@@ -50,10 +48,13 @@ export default function CustomerInvoicePage() {
         // Transform Supabase data to match OrderHistoryEntry format
         const invoiceData: OrderHistoryEntry = {
           id: data.invoice.id,
+          invoiceNumber: data.invoice.order_data.invoiceNumber,
+          deliveryDate: data.invoice.order_data.deliveryDate,
+          createdAt: data.invoice.created_at,
           order: data.invoice.order_data,
           status: data.invoice.status,
-          timestamp: data.invoice.created_at,
-          qrData: data.invoice.qr_data
+          qrCodeUrl: data.invoice.qr_data?.qrCodeUrl || '',
+          encryptedInvoiceId: data.invoice.qr_data?.encryptedInvoiceId || '',
         };
 
         setInvoice(invoiceData);
