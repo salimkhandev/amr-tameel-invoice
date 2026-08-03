@@ -40,21 +40,33 @@ export const RecentHistoryPanel: React.FC = () => {
   const handleStatusUpdate = async (newStatus: InvoiceStatus) => {
     if (!selectedInvoice) return;
 
+    console.log('Updating status for invoice:', selectedInvoice.id, 'to:', newStatus);
+
     // Update IndexedDB
     const success = await updateInvoiceStatus(selectedInvoice.id, newStatus);
     
     // Update Supabase
     try {
-      await fetch(`/api/invoices/${selectedInvoice.id}`, {
+      const response = await fetch(`/api/invoices/${selectedInvoice.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ status: newStatus }),
       });
+
+      const data = await response.json();
+      console.log('Supabase status update response:', data);
+
+      if (!response.ok) {
+        console.error('Failed to update Supabase status:', data.error);
+        alert('Failed to update status in database: ' + (data.error || 'Unknown error'));
+      } else {
+        console.log('Successfully updated status in Supabase');
+      }
     } catch (supabaseError) {
       console.error('Failed to update Supabase status:', supabaseError);
-      // Don't fail the update if Supabase fails
+      alert('Failed to update status in database. Please check your connection.');
     }
 
     if (success) {
@@ -62,7 +74,7 @@ export const RecentHistoryPanel: React.FC = () => {
       setShowStatusModal(false);
       setSelectedInvoice(null);
     } else {
-      alert('Failed to update invoice status');
+      alert('Failed to update invoice status locally');
     }
   };
 
