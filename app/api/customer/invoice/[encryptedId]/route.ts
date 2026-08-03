@@ -18,14 +18,19 @@ export async function GET(
       );
     }
 
+    console.log('Fetching invoice for encryptedId:', encryptedId);
+
     // Verify and decrypt the encrypted ID
     const invoiceId = verifyEncryptedInvoiceId(encryptedId);
     if (!invoiceId) {
+      console.error('Failed to verify encrypted invoice ID');
       return NextResponse.json(
         { error: 'Invalid or expired invoice link' },
         { status: 401 }
       );
     }
+
+    console.log('Decrypted invoice ID:', invoiceId);
 
     // Initialize Supabase client
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -51,17 +56,20 @@ export async function GET(
     if (fetchError) {
       console.error('Supabase fetch error:', fetchError);
       return NextResponse.json(
-        { error: 'Invoice not found' },
+        { error: 'Invoice not found', details: fetchError.message },
         { status: 404 }
       );
     }
 
     if (!invoice) {
+      console.error('Invoice not found in database for ID:', invoiceId);
       return NextResponse.json(
-        { error: 'Invoice not found' },
+        { error: 'Invoice not found', invoiceId },
         { status: 404 }
       );
     }
+
+    console.log('Successfully fetched invoice:', invoice.id);
 
     return NextResponse.json({
       success: true,
@@ -71,7 +79,7 @@ export async function GET(
   } catch (error) {
     console.error('Customer invoice API error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }

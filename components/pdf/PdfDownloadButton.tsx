@@ -199,7 +199,7 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
 
       // Store invoice in Supabase for customer access
       try {
-        await fetch('/api/invoices', {
+        const supabaseResponse = await fetch('/api/invoices', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -214,7 +214,15 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
             },
           }),
         });
-        console.log('Successfully stored invoice in Supabase');
+
+        const supabaseData = await supabaseResponse.json();
+        console.log('Supabase storage response:', supabaseData);
+
+        if (!supabaseResponse.ok) {
+          console.error('Failed to store in Supabase:', supabaseData.error);
+        } else {
+          console.log('Successfully stored invoice in Supabase');
+        }
       } catch (supabaseError) {
         console.error('Failed to store in Supabase:', supabaseError);
         // Don't fail the download if Supabase storage fails
