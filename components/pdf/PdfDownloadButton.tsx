@@ -101,8 +101,8 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
         // Also update width/height to match new QR code size
         img.setAttribute('width', '300');
         img.setAttribute('height', '300');
-        // Add force-visible class to image
-        img.classList.add('force-visible');
+        // Add force-visible-block class to image (images need display: block)
+        img.classList.add('force-visible-block');
         // Force image visibility with inline styles
         img.style.removeProperty('display');
         img.style.setProperty('display', 'block', 'important');

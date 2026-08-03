@@ -18,6 +18,12 @@
     visibility: visible !important;
     opacity: 1 !important;
   }
+
+  .force-visible-block {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
 }
 
 @keyframes progress {
