@@ -129,13 +129,15 @@ export async function PATCH(
     console.log('Current status:', existingInvoice.status, 'New status:', status);
 
     // Update invoice status
-    const { error: updateError } = await supabase
+    const { data: updatedInvoice, error: updateError } = await supabase
       .from('invoices')
       .update({
         status,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', id);
+      .eq('id', id)
+      .select()
+      .single();
 
     if (updateError) {
       console.error('Supabase update error:', updateError);
@@ -146,6 +148,7 @@ export async function PATCH(
     }
 
     console.log('Successfully updated invoice status:', id, 'to:', status);
+    console.log('Updated invoice data:', updatedInvoice);
 
     return NextResponse.json({
       success: true,
