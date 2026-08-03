@@ -97,5 +97,5 @@ export function generateCustomerInvoiceUrl(encryptedId: string): string {
  */
 export async function generateQrCodeUrl(data: string): Promise<string> {
   const encodedData = encodeURIComponent(data);
-  return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodedData}`;
+  return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodedData}&color=000000&bgcolor=ffffff`;
 }

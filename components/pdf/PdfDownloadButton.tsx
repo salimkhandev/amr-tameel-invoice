@@ -33,6 +33,11 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
       const qrContainer = clone.querySelector('#qr-code') as HTMLElement;
       if (qrContainer) {
         qrContainer.style.display = 'flex';
+        qrContainer.style.visibility = 'visible';
+        qrContainer.style.opacity = '1';
+        console.log('QR container display set to flex');
+      } else {
+        console.error('QR container not found in clone');
       }
 
       // Replace all input elements with plain spans with width: auto to prevent digit truncation
@@ -84,8 +89,19 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
       const qrImages = clone.querySelectorAll('img[alt="QR Code"]');
       console.log('Found QR code images:', qrImages.length);
       qrImages.forEach((img) => {
-        console.log('Replacing QR code src from:', img.getAttribute('src'), 'to:', qrCodeUrl);
+        const oldSrc = img.getAttribute('src');
+        console.log('Replacing QR code src from:', oldSrc, 'to:', qrCodeUrl);
         img.setAttribute('src', qrCodeUrl);
+        // Also update width/height to match new QR code size
+        img.setAttribute('width', '300');
+        img.setAttribute('height', '300');
+        // Ensure the parent container is visible
+        const parent = img.parentElement;
+        if (parent) {
+          parent.style.display = 'flex';
+          parent.style.visibility = 'visible';
+          parent.style.opacity = '1';
+        }
       });
 
       let htmlContent = clone.outerHTML;
