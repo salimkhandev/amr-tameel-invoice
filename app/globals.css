@@ -12,16 +12,6 @@
   .font-roboto {
     font-family: 'Roboto', sans-serif;
   }
-
-  .hide-in-browser {
-    display: none;
-  }
-
-  @media print {
-    .hide-in-browser {
-      display: flex !important;
-    }
-  }
 }
 
 @keyframes progress {
