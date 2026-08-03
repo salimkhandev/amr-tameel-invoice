@@ -40,7 +40,23 @@ export const RecentHistoryPanel: React.FC = () => {
   const handleStatusUpdate = async (newStatus: InvoiceStatus) => {
     if (!selectedInvoice) return;
 
+    // Update IndexedDB
     const success = await updateInvoiceStatus(selectedInvoice.id, newStatus);
+    
+    // Update Supabase
+    try {
+      await fetch(`/api/invoices/${selectedInvoice.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+    } catch (supabaseError) {
+      console.error('Failed to update Supabase status:', supabaseError);
+      // Don't fail the update if Supabase fails
+    }
+
     if (success) {
       await loadHistory();
       setShowStatusModal(false);

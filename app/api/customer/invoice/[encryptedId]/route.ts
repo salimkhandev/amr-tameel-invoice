@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyEncryptedInvoiceId } from '@/lib/qr';
+import { createClient } from '@supabase/supabase-js';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,15 +27,45 @@ export async function GET(
       );
     }
 
-    // Since we're using IndexedDB client-side storage, we can't directly access it from the server
-    // For now, return a message indicating the invoice ID is valid but needs client-side access
-    // In a production environment, you would store invoices in a database (Supabase, PostgreSQL, etc.)
-    
+    // Initialize Supabase client
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !supabaseKey) {
+      console.error('Missing Supabase credentials');
+      return NextResponse.json(
+        { error: 'Server configuration error' },
+        { status: 500 }
+      );
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Fetch invoice from Supabase
+    const { data: invoice, error: fetchError } = await supabase
+      .from('invoices')
+      .select('*')
+      .eq('id', invoiceId)
+      .single();
+
+    if (fetchError) {
+      console.error('Supabase fetch error:', fetchError);
+      return NextResponse.json(
+        { error: 'Invoice not found' },
+        { status: 404 }
+      );
+    }
+
+    if (!invoice) {
+      return NextResponse.json(
+        { error: 'Invoice not found' },
+        { status: 404 }
+      );
+    }
+
     return NextResponse.json({
       success: true,
-      invoiceId,
-      message: 'Invoice ID is valid. Access the customer page to view full details.',
-      customerUrl: `${request.nextUrl.origin}/customer/invoice/${encryptedId}`
+      invoice
     });
 
   } catch (error) {

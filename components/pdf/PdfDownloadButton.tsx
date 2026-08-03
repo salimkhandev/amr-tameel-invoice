@@ -197,6 +197,29 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
         // Don't fail the download if history storage fails
       }
 
+      // Store invoice in Supabase for customer access
+      try {
+        await fetch('/api/invoices', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id: order.id,
+            order_data: order,
+            status: 'In Transit',
+            qr_data: {
+              qrCodeUrl: customerUrl || '',
+              encryptedInvoiceId: encryptedId || '',
+            },
+          }),
+        });
+        console.log('Successfully stored invoice in Supabase');
+      } catch (supabaseError) {
+        console.error('Failed to store in Supabase:', supabaseError);
+        // Don't fail the download if Supabase storage fails
+      }
+
       if (onSuccess) {
         onSuccess();
       }

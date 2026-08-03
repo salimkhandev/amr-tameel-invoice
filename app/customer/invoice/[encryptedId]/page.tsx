@@ -33,19 +33,28 @@ export default function CustomerInvoicePage() {
         setLoading(true);
         setError(null);
 
-        // Verify and decrypt the encrypted ID
-        const invoiceId = verifyEncryptedInvoiceId(encryptedId);
-        if (!invoiceId) {
-          setError('Invalid or expired invoice link. Please contact support.');
+        // Fetch invoice from API
+        const response = await fetch(`/api/customer/invoice/${encryptedId}`);
+        const data = await response.json();
+
+        if (!response.ok) {
+          setError(data.error || 'Failed to load invoice');
           return;
         }
 
-        // Fetch invoice from IndexedDB
-        const invoiceData = await getInvoiceByEncryptedId(encryptedId);
-        if (!invoiceData) {
-          setError('Invoice not found. It may have been removed from history (max 5 invoices stored).');
+        if (!data.success || !data.invoice) {
+          setError('Invoice not found');
           return;
         }
+
+        // Transform Supabase data to match OrderHistoryEntry format
+        const invoiceData: OrderHistoryEntry = {
+          id: data.invoice.id,
+          order: data.invoice.order_data,
+          status: data.invoice.status,
+          timestamp: data.invoice.created_at,
+          qrData: data.invoice.qr_data
+        };
 
         setInvoice(invoiceData);
       } catch (err) {
