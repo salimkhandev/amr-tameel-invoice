@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { DeliveryOrder, InvoiceStatus } from '@/types/delivery-order';
-import { buildQrPayload, generateEncryptedInvoiceId, generateCustomerInvoiceUrl, generateQrCodeUrl } from '@/lib/qr';
+import { buildQrPayload, generateCustomerInvoiceUrl, generateQrCodeUrl } from '@/lib/qr';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,14 +18,13 @@ export async function POST(request: NextRequest) {
     // Generate QR code components on server side
     const defaultStatus: InvoiceStatus = status || 'In Transit';
     const qrPayload = buildQrPayload(order as DeliveryOrder, defaultStatus);
-    const encryptedId = generateEncryptedInvoiceId(order.id);
-    const customerUrl = generateCustomerInvoiceUrl(encryptedId);
+    const customerUrl = generateCustomerInvoiceUrl(order.id);
     const qrCodeUrl = await generateQrCodeUrl(customerUrl);
 
     return NextResponse.json({
       success: true,
       qrCodeUrl,
-      encryptedId,
+      invoiceId: order.id,
       customerUrl,
       qrPayload
     });

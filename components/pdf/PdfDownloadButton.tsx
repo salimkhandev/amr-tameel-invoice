@@ -56,7 +56,7 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
 
       // Generate QR code components via server API
       let qrCodeUrl = '';
-      let encryptedId = '';
+      let invoiceId = '';
       let customerUrl = '';
       
       try {
@@ -77,7 +77,7 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
 
         const qrData = await qrResponse.json();
         qrCodeUrl = qrData.qrCodeUrl;
-        encryptedId = qrData.encryptedId;
+        invoiceId = qrData.invoiceId;
         customerUrl = qrData.customerUrl;
         console.log('QR code URL generated:', customerUrl);
       } catch (qrError) {
@@ -259,7 +259,7 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
           pdfBlob: blob,
           status: currentStatus,
           qrCodeUrl: customerUrl || '',
-          encryptedInvoiceId: encryptedId || '',
+          encryptedInvoiceId: invoiceId || '',
         });
         console.log('Successfully added to history');
       } catch (historyError) {
@@ -280,7 +280,7 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
           status: currentStatus,
           qr_data: {
             qrCodeUrl: customerUrl || '',
-            encryptedInvoiceId: encryptedId || '',
+            encryptedInvoiceId: invoiceId || '',
           },
         };
         

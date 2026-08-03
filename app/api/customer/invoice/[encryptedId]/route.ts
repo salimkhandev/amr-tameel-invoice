@@ -1,36 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyEncryptedInvoiceId } from '@/lib/qr';
 import { createClient } from '@supabase/supabase-js';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { encryptedId: string } }
+  { params }: { params: { invoiceId: string } }
 ) {
   try {
-    const { encryptedId } = params;
+    const { invoiceId } = params;
 
-    if (!encryptedId) {
+    if (!invoiceId) {
       return NextResponse.json(
-        { error: 'Missing encrypted invoice ID' },
+        { error: 'Missing invoice ID' },
         { status: 400 }
       );
     }
 
-    console.log('Fetching invoice for encryptedId:', encryptedId);
-
-    // Verify and decrypt the encrypted ID
-    const invoiceId = verifyEncryptedInvoiceId(encryptedId);
-    if (!invoiceId) {
-      console.error('Failed to verify encrypted invoice ID');
-      return NextResponse.json(
-        { error: 'Invalid or expired invoice link' },
-        { status: 401 }
-      );
-    }
-
-    console.log('Decrypted invoice ID:', invoiceId);
+    console.log('Fetching invoice for invoiceId:', invoiceId);
 
     // Initialize Supabase client
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

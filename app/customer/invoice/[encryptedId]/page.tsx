@@ -19,7 +19,7 @@ import {
 
 export default function CustomerInvoicePage() {
   const params = useParams();
-  const encryptedId = params.encryptedId as string;
+  const invoiceId = params.invoiceId as string;
   
   const [invoice, setInvoice] = useState<OrderHistoryEntry | null>(null);
   const [loading, setLoading] = useState(true);
@@ -33,7 +33,7 @@ export default function CustomerInvoicePage() {
 
         // Add timestamp to bust cache - ensures fresh data on every load
         const timestamp = Date.now();
-        const response = await fetch(`/api/customer/invoice/${encryptedId}?t=${timestamp}`, {
+        const response = await fetch(`/api/customer/invoice/${invoiceId}?t=${timestamp}`, {
           cache: 'no-store',
           headers: {
             'Cache-Control': 'no-cache',
@@ -61,7 +61,7 @@ export default function CustomerInvoicePage() {
           order: data.invoice.order_data,
           status: data.invoice.status,
           qrCodeUrl: data.invoice.qr_data?.qrCodeUrl || '',
-          encryptedInvoiceId: data.invoice.qr_data?.encryptedInvoiceId || '',
+          encryptedInvoiceId: invoiceId || '',
         };
 
         setInvoice(invoiceData);
@@ -73,10 +73,10 @@ export default function CustomerInvoicePage() {
       }
     };
 
-    if (encryptedId) {
+    if (invoiceId) {
       loadInvoice();
     }
-  }, [encryptedId]);
+  }, [invoiceId]);
 
   const getStatusIcon = (status: string) => {
     switch (status) {
