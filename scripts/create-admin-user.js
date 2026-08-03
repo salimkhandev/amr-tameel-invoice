@@ -1,6 +1,6 @@
 /**
  * Script to create admin user in Supabase
- * Run this with: node scripts/create-admin-user.js
+ * Run this with: node scripts/create-admin-user.jsdg
  */
 
 const bcrypt = require('bcryptjs');
