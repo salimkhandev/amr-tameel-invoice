@@ -29,11 +29,19 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
       // Clone template DOM so we can clean up interactive inputs for PDF rendering
       const clone = templateRef.current.cloneNode(true) as HTMLElement;
 
-      // Show QR code in PDF (hidden in browser) - remove inline display: none
+      // Show QR code in PDF (hidden in browser) - Force display: flex
       const qrContainer = clone.querySelector('#qr-code') as HTMLElement;
       if (qrContainer) {
-        qrContainer.style.display = 'flex';
-        console.log('QR container display set to flex');
+        // Remove any existing display style
+        qrContainer.style.removeProperty('display');
+        // Force display to flex
+        qrContainer.style.setProperty('display', 'flex', 'important');
+        // Also remove any other visibility hiding styles
+        qrContainer.style.removeProperty('visibility');
+        qrContainer.style.setProperty('visibility', 'visible', 'important');
+        qrContainer.style.removeProperty('opacity');
+        qrContainer.style.setProperty('opacity', '1', 'important');
+        console.log('QR container visibility forced - display:flex, visibility:visible, opacity:1');
       } else {
         console.error('QR container not found in clone');
       }
@@ -93,12 +101,22 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
         // Also update width/height to match new QR code size
         img.setAttribute('width', '300');
         img.setAttribute('height', '300');
+        // Force image visibility
+        img.style.removeProperty('display');
+        img.style.setProperty('display', 'block', 'important');
+        img.style.removeProperty('visibility');
+        img.style.setProperty('visibility', 'visible', 'important');
+        img.style.removeProperty('opacity');
+        img.style.setProperty('opacity', '1', 'important');
         // Ensure the parent container is visible
         const parent = img.parentElement;
         if (parent) {
-          parent.style.display = 'flex';
-          parent.style.visibility = 'visible';
-          parent.style.opacity = '1';
+          parent.style.removeProperty('display');
+          parent.style.setProperty('display', 'flex', 'important');
+          parent.style.removeProperty('visibility');
+          parent.style.setProperty('visibility', 'visible', 'important');
+          parent.style.removeProperty('opacity');
+          parent.style.setProperty('opacity', '1', 'important');
         }
       });
 
