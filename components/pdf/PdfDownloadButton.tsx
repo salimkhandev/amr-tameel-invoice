@@ -99,7 +99,15 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
           try {
             console.log('Converting image to base64:', src);
             const response = await fetch(src);
+            
+            if (!response.ok) {
+              console.error('Failed to fetch image:', src, response.status);
+              continue;
+            }
+            
             const blob = await response.blob();
+            console.log('Image blob size:', blob.size, 'type:', blob.type);
+            
             const reader = new FileReader();
             await new Promise((resolve, reject) => {
               reader.onload = resolve;
@@ -107,6 +115,7 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
               reader.readAsDataURL(blob);
             });
             const base64 = reader.result as string;
+            console.log('Base64 length:', base64.length);
             htmlContent = htmlContent.replace(src, base64);
             console.log('Successfully converted:', src);
           } catch (error) {
