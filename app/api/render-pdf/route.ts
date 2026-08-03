@@ -51,6 +51,8 @@ function buildHtmlDocument(html: string, css?: string): string {
       h1, .font-extrabold { font-weight: 800 !important; color: #000000 !important; }
       /* Show QR code in PDF but hide in browser */
       .hidden-pdf-only { display: block !important; }
+      /* Ensure hidden-in-browser elements are visible in PDF */
+      .hidden-in-browser { display: flex !important; visibility: visible !important; opacity: 1 !important; }
     </style>
     ${css ? `<style>${css}</style>` : ""}
   </head>

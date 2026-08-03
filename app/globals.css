@@ -24,6 +24,10 @@
     visibility: visible !important;
     opacity: 1 !important;
   }
+
+  .hidden-in-browser {
+    display: none !important;
+  }
 }
 
 @keyframes progress {
