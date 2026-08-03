@@ -95,6 +95,7 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
       const qrImages = clone.querySelectorAll('img[alt="QR Code"]');
       console.log('Found QR code images:', qrImages.length);
       qrImages.forEach((img) => {
+        const htmlImg = img as HTMLElement;
         const oldSrc = img.getAttribute('src');
         console.log('Replacing QR code src from:', oldSrc, 'to:', qrCodeUrl);
         img.setAttribute('src', qrCodeUrl);
@@ -102,24 +103,25 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
         img.setAttribute('width', '300');
         img.setAttribute('height', '300');
         // Add force-visible-block class to image (images need display: block)
-        img.classList.add('force-visible-block');
+        htmlImg.classList.add('force-visible-block');
         // Force image visibility with inline styles
-        img.style.removeProperty('display');
-        img.style.setProperty('display', 'block', 'important');
-        img.style.removeProperty('visibility');
-        img.style.setProperty('visibility', 'visible', 'important');
-        img.style.removeProperty('opacity');
-        img.style.setProperty('opacity', '1', 'important');
+        htmlImg.style.removeProperty('display');
+        htmlImg.style.setProperty('display', 'block', 'important');
+        htmlImg.style.removeProperty('visibility');
+        htmlImg.style.setProperty('visibility', 'visible', 'important');
+        htmlImg.style.removeProperty('opacity');
+        htmlImg.style.setProperty('opacity', '1', 'important');
         // Ensure the parent container is visible
-        const parent = img.parentElement;
+        const parent = htmlImg.parentElement;
         if (parent) {
-          parent.classList.add('force-visible');
-          parent.style.removeProperty('display');
-          parent.style.setProperty('display', 'flex', 'important');
-          parent.style.removeProperty('visibility');
-          parent.style.setProperty('visibility', 'visible', 'important');
-          parent.style.removeProperty('opacity');
-          parent.style.setProperty('opacity', '1', 'important');
+          const htmlParent = parent as HTMLElement;
+          htmlParent.classList.add('force-visible');
+          htmlParent.style.removeProperty('display');
+          htmlParent.style.setProperty('display', 'flex', 'important');
+          htmlParent.style.removeProperty('visibility');
+          htmlParent.style.setProperty('visibility', 'visible', 'important');
+          htmlParent.style.removeProperty('opacity');
+          htmlParent.style.setProperty('opacity', '1', 'important');
         }
       });
 
