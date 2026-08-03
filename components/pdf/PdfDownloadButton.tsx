@@ -31,14 +31,15 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
       // Clone template DOM so we can clean up interactive inputs for PDF rendering
       const clone = templateRef.current.cloneNode(true) as HTMLElement;
 
-      // Show QR code in PDF (hidden in browser) - Remove hidden-in-browser class
+      // Show QR code in PDF (hidden in browser) - Keep the class but add inline styles
       const qrContainer = clone.querySelector('#qr-code') as HTMLElement;
       if (qrContainer) {
-        // Remove the hidden-in-browser class to make it visible in PDF
-        qrContainer.classList.remove('hidden-in-browser');
-        // Add force-visible class for extra safety
-        qrContainer.classList.add('force-visible');
-        console.log('QR container made visible by removing hidden-in-browser class');
+        // DON'T remove hidden-in-browser class - the CSS in render-pdf route handles it
+        // Instead, add inline styles to ensure visibility in PDF
+        qrContainer.style.display = 'flex';
+        qrContainer.style.visibility = 'visible';
+        qrContainer.style.opacity = '1';
+        console.log('QR container made visible with inline styles');
       } else {
         console.error('QR container not found in clone');
       }
