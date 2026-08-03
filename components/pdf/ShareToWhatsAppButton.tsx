@@ -25,11 +25,103 @@ export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
     try {
       setIsProcessing(true);
 
+      // Fetch current status from Supabase first
+      let currentStatus = 'In Transit';
+      try {
+        const statusResponse = await fetch(`/api/invoices/${order.id}?t=${Date.now()}`, {
+          cache: 'no-store',
+        });
+        if (statusResponse.ok) {
+          const statusData = await statusResponse.json();
+          if (statusData.invoice?.status) {
+            currentStatus = statusData.invoice.status;
+            console.log('Current status fetched from Supabase:', currentStatus);
+          }
+        }
+      } catch (statusError) {
+        console.warn('Failed to fetch current status, using default:', statusError);
+      }
+
+      // Generate QR code with current status and plain invoice ID
+      let qrCodeUrl = '';
+      let customerUrl = '';
+      try {
+        const qrResponse = await fetch('/api/generate-qr', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            order: order,
+            status: currentStatus,
+          }),
+        });
+
+        if (!qrResponse.ok) {
+          throw new Error(`QR generation API failed: ${qrResponse.status}`);
+        }
+
+        const qrData = await qrResponse.json();
+        qrCodeUrl = qrData.qrCodeUrl;
+        customerUrl = qrData.customerUrl;
+        console.log('QR code URL generated:', customerUrl);
+      } catch (qrError) {
+        console.error('QR code generation failed:', qrError);
+        throw new Error('Failed to generate QR code. Please try again.');
+      }
+
+      // Pre-load and verify QR code image before proceeding
+      console.log('Verifying QR code image loads...');
+      await new Promise<void>((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+          console.log('QR code image verified loaded successfully');
+          resolve();
+        };
+        img.onerror = () => {
+          console.error('QR code image failed to load');
+          reject(new Error('QR code image failed to load'));
+        };
+        img.src = qrCodeUrl;
+        
+        // Timeout after 10 seconds
+        setTimeout(() => reject(new Error('QR code image load timeout')), 10000);
+      });
+
       // Get the HTML content from the template
-      let htmlContent = templateRef.current.outerHTML;
+      // Clone template DOM to insert QR code
+      const clone = templateRef.current.cloneNode(true) as HTMLElement;
+
+      // Show QR code in PDF - use off-screen positioning instead of display:none
+      const qrContainer = clone.querySelector('#qr-code') as HTMLElement;
+      if (qrContainer) {
+        // Make visible with inline styles (CSS backup still applies)
+        qrContainer.style.display = 'flex';
+        qrContainer.style.visibility = 'visible';
+        qrContainer.style.opacity = '1';
+        console.log('QR container made visible with inline styles');
+      } else {
+        console.error('QR container not found in clone');
+        throw new Error('QR container not found in template');
+      }
+
+      // Replace all input elements with plain spans
+      const inputs = clone.querySelectorAll('input');
+      inputs.forEach((input) => {
+        const span = document.createElement('span');
+        span.textContent = input.value;
+        const dirAttr = input.getAttribute('dir');
+        if (dirAttr) span.setAttribute('dir', dirAttr);
+        span.style.display = 'inline-block';
+        span.style.width = 'auto';
+        span.style.whiteSpace = 'nowrap';
+        input.parentNode?.replaceChild(span, input);
+      });
+
+      let htmlContent = clone.outerHTML;
       
       // Convert images to base64 data URLs
-      const images = templateRef.current.querySelectorAll('img');
+      const images = clone.querySelectorAll('img');
       for (const img of Array.from(images)) {
         const src = img.getAttribute('src');
         if (src && !src.startsWith('data:')) {
