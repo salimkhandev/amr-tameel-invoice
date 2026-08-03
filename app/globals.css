@@ -12,6 +12,12 @@
   .font-roboto {
     font-family: 'Roboto', sans-serif;
   }
+
+  .force-visible {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
 }
 
 @keyframes progress {

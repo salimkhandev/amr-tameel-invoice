@@ -32,16 +32,16 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
       // Show QR code in PDF (hidden in browser) - Force display: flex
       const qrContainer = clone.querySelector('#qr-code') as HTMLElement;
       if (qrContainer) {
-        // Remove any existing display style
+        // Add the force-visible class
+        qrContainer.classList.add('force-visible');
+        // Also apply inline styles for maximum compatibility
         qrContainer.style.removeProperty('display');
-        // Force display to flex
         qrContainer.style.setProperty('display', 'flex', 'important');
-        // Also remove any other visibility hiding styles
         qrContainer.style.removeProperty('visibility');
         qrContainer.style.setProperty('visibility', 'visible', 'important');
         qrContainer.style.removeProperty('opacity');
         qrContainer.style.setProperty('opacity', '1', 'important');
-        console.log('QR container visibility forced - display:flex, visibility:visible, opacity:1');
+        console.log('QR container visibility forced with class and inline styles');
       } else {
         console.error('QR container not found in clone');
       }
@@ -101,7 +101,9 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
         // Also update width/height to match new QR code size
         img.setAttribute('width', '300');
         img.setAttribute('height', '300');
-        // Force image visibility
+        // Add force-visible class to image
+        img.classList.add('force-visible');
+        // Force image visibility with inline styles
         img.style.removeProperty('display');
         img.style.setProperty('display', 'block', 'important');
         img.style.removeProperty('visibility');
@@ -111,6 +113,7 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
         // Ensure the parent container is visible
         const parent = img.parentElement;
         if (parent) {
+          parent.classList.add('force-visible');
           parent.style.removeProperty('display');
           parent.style.setProperty('display', 'flex', 'important');
           parent.style.removeProperty('visibility');
