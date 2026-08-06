@@ -267,74 +267,64 @@ export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
         console.error('Failed to add to history:', historyError);
       }
 
-      // Store invoice in Supabase - THIS IS CRITICAL FOR QR CODE TO WORK
+      // Run DB insert and Storage upload in parallel — they're independent
+      const supabasePayload = {
+        id: order.id,
+        order_data: order,
+        status: currentStatus,
+        qr_data: {
+          qrCodeUrl: customerUrl || '',
+          encryptedInvoiceId: invoiceId || '',
+        },
+      };
+      
       console.log('═══════════════════════════════════════════════════');
-      console.log('SAVING TO SUPABASE - Invoice ID:', order.id);
+      console.log('RUNNING PARALLEL: DB insert + Storage upload');
+      console.log('Invoice ID:', order.id);
       console.log('Status:', currentStatus);
       console.log('Customer URL:', customerUrl);
       console.log('═══════════════════════════════════════════════════');
       
-      try {
-        const supabasePayload = {
-          id: order.id,
-          order_data: order,
-          status: currentStatus,
-          qr_data: {
-            qrCodeUrl: customerUrl || '',
-            encryptedInvoiceId: invoiceId || '',
-          },
-        };
-        
-        console.log('Supabase payload:', JSON.stringify(supabasePayload, null, 2));
-        
-        const supabaseResponse = await fetch('/api/invoices', {
+      const [dbResult, uploadResult] = await Promise.allSettled([
+        fetch('/api/invoices', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(supabasePayload),
-        });
+        }),
+        (async () => {
+          const uploadForm = new FormData();
+          uploadForm.append('file', blob, filename);
+          uploadForm.append('filename', filename);
+          const res = await fetch('/api/upload-invoice-pdf', { method: 'POST', body: uploadForm });
+          if (!res.ok) {
+            const errorText = await res.text();
+            console.error('PDF upload failed:', errorText);
+            throw new Error('PDF upload failed');
+          }
+          return res.json();
+        })(),
+      ]);
 
-        console.log('Supabase API response status:', supabaseResponse.status, supabaseResponse.statusText);
-        
-        const supabaseData = await supabaseResponse.json();
-        console.log('Supabase storage response:', supabaseData);
-
-        if (!supabaseResponse.ok) {
-          console.error('❌ FAILED TO STORE IN SUPABASE:', supabaseData.error);
-          console.error('Response:', supabaseData);
-          // Show error to user if Supabase storage fails
-          alert(`CRITICAL: Invoice was generated but FAILED to save to database!\n\nThe QR code will NOT work!\n\nError: ${supabaseData.error || 'Unknown error'}\n\nPlease try sharing again or contact support.`);
-          throw new Error('Failed to save invoice to database');
-        } else {
-          console.log('✅ SUCCESS: Invoice stored in Supabase');
-          console.log('Invoice ID:', order.id);
-          console.log('Status:', status);
-          console.log('QR Code will work for customer URL:', customerUrl);
-        }
-      } catch (supabaseError) {
-        console.error('❌ EXCEPTION during Supabase storage:', supabaseError);
-        alert(`CRITICAL: Invoice was generated but FAILED to save to database!\n\nThe QR code will NOT work!\n\nError: ${supabaseError}\n\nPlease check your internet connection and try again.`);
-        throw supabaseError;
+      // Handle DB result
+      if (dbResult.status === 'rejected') {
+        console.error('❌ DB insert failed:', dbResult.reason);
+        alert('CRITICAL: Invoice was generated but FAILED to save to database!\n\nThe QR code will NOT work!\n\nPlease try sharing again.');
+      } else if (dbResult.status === 'fulfilled' && !dbResult.value.ok) {
+        const supabaseData = await dbResult.value.json();
+        console.error('❌ FAILED TO STORE IN SUPABASE:', supabaseData.error);
+        alert(`CRITICAL: Invoice was generated but FAILED to save to database!\n\nThe QR code will NOT work!\n\nError: ${supabaseData.error || 'Unknown error'}\n\nPlease try sharing again.`);
+      } else {
+        console.log('✅ SUCCESS: Invoice stored in Supabase');
       }
 
-      // Upload PDF to get a shareable link — works identically on every device
-      const uploadForm = new FormData();
-      uploadForm.append('file', blob, filename);
-      uploadForm.append('filename', filename);
-
-      const uploadResponse = await fetch('/api/upload-invoice-pdf', {
-        method: 'POST',
-        body: uploadForm,
-      });
-
-      if (!uploadResponse.ok) {
-        const errorText = await uploadResponse.text();
-        console.error('PDF upload failed:', errorText);
-        throw new Error('Failed to upload PDF for sharing');
+      // Handle upload result
+      if (uploadResult.status === 'rejected') {
+        console.error('❌ Storage upload failed:', uploadResult.reason);
+        throw new Error('Failed to prepare shareable link');
       }
 
-      const { url: pdfUrl } = await uploadResponse.json();
+      const { url: pdfUrl } = uploadResult.value;
+      console.log('✅ PDF uploaded, shareable URL:', pdfUrl);
 
       // Keep a local copy for the user too
       const localUrl = window.URL.createObjectURL(blob);
