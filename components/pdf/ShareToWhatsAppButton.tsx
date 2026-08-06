@@ -320,7 +320,22 @@ export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
       // Handle upload result
       if (uploadResult.status === 'rejected') {
         console.error('❌ Storage upload failed:', uploadResult.reason);
-        throw new Error('Failed to prepare shareable link');
+        console.warn('Falling back to download-only approach');
+        
+        // Fallback: Download PDF + open WhatsApp without link
+        const localUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = localUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(localUrl);
+        document.body.removeChild(a);
+
+        const msg = encodeURIComponent(`Invoice #${order.invoiceNumber} - PDF file downloaded. Please attach it manually.`);
+        window.open(`https://wa.me/?text=${msg}`, '_blank');
+        alert('PDF downloaded. Please attach it manually in WhatsApp (Storage upload failed - check Supabase Storage bucket setup).');
+        return;
       }
 
       const { url: pdfUrl } = uploadResult.value;
