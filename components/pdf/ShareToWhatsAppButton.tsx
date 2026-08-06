@@ -318,51 +318,37 @@ export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
         throw supabaseError;
       }
 
-      // Try native share (attaches the PDF directly) — works on mobile
-      const file = new File([blob], filename, { type: 'application/pdf' });
-      const shareText = `Invoice #${order.invoiceNumber}`;
+      // Upload PDF to get a shareable link — works identically on every device
+      const uploadForm = new FormData();
+      uploadForm.append('file', blob, filename);
+      uploadForm.append('filename', filename);
 
-      const canShareFile =
-        typeof navigator !== 'undefined' &&
-        !!navigator.canShare &&
-        navigator.canShare({ files: [file] });
+      const uploadResponse = await fetch('/api/upload-invoice-pdf', {
+        method: 'POST',
+        body: uploadForm,
+      });
 
-      if (canShareFile) {
-        try {
-          await navigator.share({
-            files: [file],
-            title: shareText,
-            text: shareText,
-          });
-          // Success — the native share sheet handled it (user picked WhatsApp, etc.)
-          return;
-        } catch (shareError) {
-          // User cancelled the share sheet — don't fall through to download
-          if (shareError instanceof Error && shareError.name === 'AbortError') {
-            return;
-          }
-          console.warn('navigator.share failed, falling back to download:', shareError);
-          // fall through to manual download below
-        }
+      if (!uploadResponse.ok) {
+        const errorText = await uploadResponse.text();
+        console.error('PDF upload failed:', errorText);
+        throw new Error('Failed to upload PDF for sharing');
       }
 
-      // Fallback (desktop, or unsupported browsers): download + open WhatsApp Web
-      const url = window.URL.createObjectURL(blob);
+      const { url: pdfUrl } = await uploadResponse.json();
+
+      // Keep a local copy for the user too
+      const localUrl = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url;
+      a.href = localUrl;
       a.download = filename;
       document.body.appendChild(a);
       a.click();
-      window.URL.revokeObjectURL(url);
+      window.URL.revokeObjectURL(localUrl);
       document.body.removeChild(a);
 
-      const msg = encodeURIComponent(
-        `Invoice #${order.invoiceNumber} - PDF file attached.`
-      );
-      // Using wa.me without phone number to let user select contact
-      const whatsappUrl = `https://wa.me/?text=${msg}`;
-      window.open(whatsappUrl, '_blank');
-      alert('File downloaded — please attach it manually in the WhatsApp conversation that just opened (this is required on desktop).');
+      // Open WhatsApp with message + link — no attach step, no platform checks
+      const msg = encodeURIComponent(`Invoice #${order.invoiceNumber}\n${pdfUrl}`);
+      window.open(`https://wa.me/?text=${msg}`, '_blank');
     } catch (err) {
       console.error('WhatsApp share failed:', err);
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
