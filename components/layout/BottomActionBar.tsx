@@ -3,7 +3,6 @@
 import React from 'react';
 import { DeliveryOrder } from '@/types/delivery-order';
 import { PdfDownloadButton } from '@/components/pdf/PdfDownloadButton';
-import { ShareToWhatsAppButton } from '@/components/pdf/ShareToWhatsAppButton';
 
 interface BottomActionBarProps {
   templateRef: React.RefObject<HTMLDivElement | null>;
@@ -25,12 +24,6 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
         order={order}
         status={status as any}
         onSuccess={onSuccess}
-        className="flex-1 py-2 text-xs"
-      />
-      <ShareToWhatsAppButton
-        templateRef={templateRef}
-        order={order}
-        status={status as any}
         className="flex-1 py-2 text-xs"
       />
     </div>

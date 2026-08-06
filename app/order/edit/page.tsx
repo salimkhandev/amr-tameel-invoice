@@ -8,7 +8,6 @@ import { BottomActionBar } from '@/components/layout/BottomActionBar';
 import { DeliveryOrderTemplate } from '@/components/template/DeliveryOrderTemplate';
 import { PdfPreviewScaler } from '@/components/pdf/PdfPreviewScaler';
 import { PdfDownloadButton } from '@/components/pdf/PdfDownloadButton';
-import { ShareToWhatsAppButton } from '@/components/pdf/ShareToWhatsAppButton';
 import { DeliveryOrder } from '@/types/delivery-order';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
@@ -79,7 +78,6 @@ function OrderEditorContent() {
 
             <div className="flex items-center gap-2 hidden md:flex">
               <PdfDownloadButton templateRef={templateRef} order={order} status="In Transit" />
-              <ShareToWhatsAppButton templateRef={templateRef} order={order} status="In Transit" />
             </div>
           </div>
         </div>

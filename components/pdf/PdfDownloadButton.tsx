@@ -259,7 +259,7 @@ export const PdfDownloadButton: React.FC<PdfDownloadButtonProps> = ({
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
 
-      console.log('Adding to history with QR data...');
+      console.log('Adding to history...');
       // Add to IndexedDB history
       try {
         await addInvoiceToHistory({

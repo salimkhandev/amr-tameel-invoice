@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import { PdfStorageCleanup } from '@/components/pdf/PdfStorageCleanup';
 
 export const metadata: Metadata = {
   title: 'Amar Tameel',
@@ -41,7 +40,6 @@ export default function RootLayout({
       </head>
       <body className="bg-gray-100 font-cairo text-slate-900 min-h-screen antialiased">
         {children}
-        <PdfStorageCleanup />
         <script
           dangerouslySetInnerHTML={{
             __html: `
