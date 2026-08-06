@@ -306,22 +306,8 @@ export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
         throw supabaseError;
       }
 
-      // Primary Path: Web Share API with files
-      const file = new File([blob], filename, { type: 'application/pdf' });
-      if (
-        typeof navigator !== 'undefined' &&
-        navigator.canShare &&
-        navigator.canShare({ files: [file] })
-      ) {
-        await navigator.share({
-          title: filename,
-          text: `Invoice #${order.invoiceNumber}`,
-          files: [file],
-        });
-        return;
-      }
-
-      // Fallback Path: Download PDF + open wa.me link (without specific number for contact selection)
+      // Download PDF + open wa.me link (without specific number for contact selection)
+      // Note: Web Share API cannot be used here due to async operations breaking user gesture requirement
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
