@@ -2,7 +2,9 @@ import { get, set, del, keys } from 'idb-keyval';
 import { OrderHistoryEntry, InvoiceStatus } from '@/types/delivery-order';
 
 const HISTORY_KEY_PREFIX = 'history_invoice_';
+const PDF_SHARE_KEY_PREFIX = 'pdf_share_';
 const MAX_HISTORY_ITEMS = 5;
+const PDF_SHARE_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
 
 /**
  * Retrieve all recent invoices sorted by createdAt descending
@@ -148,5 +150,91 @@ export async function clearInvoiceHistory(): Promise<void> {
     }
   } catch (err) {
     console.error('Failed to clear invoice history:', err);
+  }
+}
+
+/**
+ * Store PDF blob for sharing with 1-hour expiry
+ */
+export async function storePdfForSharing(invoiceId: string, pdfBlob: Blob): Promise<void> {
+  if (typeof window === 'undefined') return;
+  try {
+    const key = `${PDF_SHARE_KEY_PREFIX}${invoiceId}`;
+    const expiryTime = Date.now() + PDF_SHARE_EXPIRY_MS;
+    
+    await set(key, {
+      blob: pdfBlob,
+      expiry: expiryTime,
+      createdAt: Date.now()
+    });
+    
+    console.log('PDF stored for sharing, expires at:', new Date(expiryTime).toISOString());
+  } catch (err) {
+    console.error('Failed to store PDF for sharing:', err);
+  }
+}
+
+/**
+ * Retrieve PDF blob for sharing (if not expired)
+ */
+export async function getPdfForSharing(invoiceId: string): Promise<{ blob: Blob; url: string } | null> {
+  if (typeof window === 'undefined') return null;
+  try {
+    const key = `${PDF_SHARE_KEY_PREFIX}${invoiceId}`;
+    const data = await get<{ blob: Blob; expiry: number; createdAt: number }>(key);
+    
+    if (!data) {
+      console.log('PDF not found in local storage');
+      return null;
+    }
+    
+    // Check if expired
+    if (Date.now() > data.expiry) {
+      console.log('PDF expired, cleaning up');
+      await del(key);
+      return null;
+    }
+    
+    // Create object URL from stored blob
+    const url = URL.createObjectURL(data.blob);
+    return { blob: data.blob, url };
+  } catch (err) {
+    console.error('Failed to retrieve PDF for sharing:', err);
+    return null;
+  }
+}
+
+/**
+ * Clean up expired PDFs from storage
+ */
+export async function cleanupExpiredPdfs(): Promise<void> {
+  if (typeof window === 'undefined') return;
+  try {
+    const allKeys = await keys();
+    const pdfKeys = allKeys.filter((k) => String(k).startsWith(PDF_SHARE_KEY_PREFIX));
+    
+    for (const key of pdfKeys) {
+      const data = await get<{ blob: Blob; expiry: number }>(key);
+      if (data && Date.now() > data.expiry) {
+        await del(key);
+        console.log('Cleaned up expired PDF:', key);
+      }
+    }
+  } catch (err) {
+    console.error('Failed to cleanup expired PDFs:', err);
+  }
+}
+
+/**
+ * Clean up specific PDF by invoice ID
+ */
+export async function cleanupPdf(invoiceId: string): Promise<void> {
+  if (typeof window === 'undefined') return;
+  try {
+    const key = `${PDF_SHARE_KEY_PREFIX}${invoiceId}`;
+    await del(key);
+    console.log('Cleaned up PDF:', invoiceId);
+  } catch (err) {
+    console.error('Failed to cleanup PDF:', err);
   }
 }

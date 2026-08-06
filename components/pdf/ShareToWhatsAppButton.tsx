@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { DeliveryOrder, InvoiceStatus } from '@/types/delivery-order';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
-import { addInvoiceToHistory } from '@/lib/history';
+import { addInvoiceToHistory, storePdfForSharing, cleanupPdf } from '@/lib/history';
 import { Share2, Loader2, WifiOff } from 'lucide-react';
 
 interface ShareToWhatsAppButtonProps {
@@ -267,7 +267,18 @@ export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
         console.error('Failed to add to history:', historyError);
       }
 
-      // Run DB insert and Storage upload in parallel — they're independent
+      // Store PDF in local IndexedDB for sharing (1-hour expiry)
+      console.log('═══════════════════════════════════════════════════');
+      console.log('STORING PDF LOCALLY for WhatsApp sharing');
+      console.log('Invoice ID:', order.id);
+      console.log('Status:', currentStatus);
+      console.log('Customer URL:', customerUrl);
+      console.log('═══════════════════════════════════════════════════');
+      
+      await storePdfForSharing(order.id, blob);
+      console.log('✅ PDF stored locally for sharing (expires in 1 hour)');
+
+      // Store invoice in Supabase for QR code functionality
       const supabasePayload = {
         id: order.id,
         order_data: order,
@@ -278,70 +289,26 @@ export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
         },
       };
       
-      console.log('═══════════════════════════════════════════════════');
-      console.log('RUNNING PARALLEL: DB insert + Storage upload');
-      console.log('Invoice ID:', order.id);
-      console.log('Status:', currentStatus);
-      console.log('Customer URL:', customerUrl);
-      console.log('═══════════════════════════════════════════════════');
-      
-      const [dbResult, uploadResult] = await Promise.allSettled([
-        fetch('/api/invoices', {
+      try {
+        const supabaseResponse = await fetch('/api/invoices', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(supabasePayload),
-        }),
-        (async () => {
-          const uploadForm = new FormData();
-          uploadForm.append('file', blob, filename);
-          uploadForm.append('filename', filename);
-          const res = await fetch('/api/upload-invoice-pdf', { method: 'POST', body: uploadForm });
-          if (!res.ok) {
-            const errorText = await res.text();
-            console.error('PDF upload failed:', errorText);
-            throw new Error('PDF upload failed');
-          }
-          return res.json();
-        })(),
-      ]);
+        });
 
-      // Handle DB result
-      if (dbResult.status === 'rejected') {
-        console.error('❌ DB insert failed:', dbResult.reason);
-        alert('CRITICAL: Invoice was generated but FAILED to save to database!\n\nThe QR code will NOT work!\n\nPlease try sharing again.');
-      } else if (dbResult.status === 'fulfilled' && !dbResult.value.ok) {
-        const supabaseData = await dbResult.value.json();
-        console.error('❌ FAILED TO STORE IN SUPABASE:', supabaseData.error);
-        alert(`CRITICAL: Invoice was generated but FAILED to save to database!\n\nThe QR code will NOT work!\n\nError: ${supabaseData.error || 'Unknown error'}\n\nPlease try sharing again.`);
-      } else {
-        console.log('✅ SUCCESS: Invoice stored in Supabase');
+        if (!supabaseResponse.ok) {
+          const supabaseData = await supabaseResponse.json();
+          console.error('❌ FAILED TO STORE IN SUPABASE:', supabaseData.error);
+          alert(`WARNING: Invoice was generated but FAILED to save to database!\n\nThe QR code will NOT work!\n\nError: ${supabaseData.error || 'Unknown error'}`);
+        } else {
+          console.log('✅ SUCCESS: Invoice stored in Supabase');
+        }
+      } catch (supabaseError) {
+        console.error('❌ EXCEPTION during Supabase storage:', supabaseError);
+        alert(`WARNING: Invoice was generated but FAILED to save to database!\n\nThe QR code will NOT work!\n\nError: ${supabaseError}`);
       }
 
-      // Handle upload result
-      if (uploadResult.status === 'rejected') {
-        console.error('❌ Storage upload failed:', uploadResult.reason);
-        console.warn('Falling back to download-only approach');
-        
-        // Fallback: Download PDF + open WhatsApp without link
-        const localUrl = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = localUrl;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(localUrl);
-        document.body.removeChild(a);
-
-        const msg = encodeURIComponent(`Invoice #${order.invoiceNumber} - PDF file downloaded. Please attach it manually.`);
-        window.open(`https://wa.me/?text=${msg}`, '_blank');
-        alert('PDF downloaded. Please attach it manually in WhatsApp (Storage upload failed - check Supabase Storage bucket setup).');
-        return;
-      }
-
-      const { url: pdfUrl } = uploadResult.value;
-      console.log('✅ PDF uploaded, shareable URL:', pdfUrl);
-
-      // Keep a local copy for the user too
+      // Download PDF locally for user to attach
       const localUrl = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = localUrl;
@@ -351,9 +318,14 @@ export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
       window.URL.revokeObjectURL(localUrl);
       document.body.removeChild(a);
 
-      // Open WhatsApp with message + link — no attach step, no platform checks
-      const msg = encodeURIComponent(`Invoice #${order.invoiceNumber}\n${pdfUrl}`);
+      // Open WhatsApp with message — user attaches the downloaded file
+      const msg = encodeURIComponent(`Invoice #${order.invoiceNumber}\nPDF has been downloaded. Please attach it to this message.`);
       window.open(`https://wa.me/?text=${msg}`, '_blank');
+      
+      // Cleanup the stored PDF after successful download
+      setTimeout(() => {
+        cleanupPdf(order.id);
+      }, 5000); // Cleanup after 5 seconds
     } catch (err) {
       console.error('WhatsApp share failed:', err);
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
