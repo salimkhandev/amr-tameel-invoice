@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
@@ -42,6 +41,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Dynamically import supabaseAdmin to avoid build-time issues
+    const { supabaseAdmin } = await import('@/lib/supabase');
+    
     // Supabase authentication using admin client
     const { data: user, error } = await supabaseAdmin
       .from('users')

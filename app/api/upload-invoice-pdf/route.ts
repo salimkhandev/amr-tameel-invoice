@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
 
 export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
   try {
+    // Dynamically import supabaseAdmin to avoid build-time issues
+    const { supabaseAdmin } = await import('@/lib/supabase');
+    
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
     const filename = formData.get('filename') as string | null;

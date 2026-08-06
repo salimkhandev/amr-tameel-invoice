@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
 import { verifyToken } from '@/lib/jwt';
 import bcrypt from 'bcryptjs';
 
@@ -8,6 +7,9 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Dynamically import supabaseAdmin to avoid build-time issues
+    const { supabaseAdmin } = await import('@/lib/supabase');
+    
     // Verify admin access
     const authHeader = request.headers.get('authorization');
     if (!authHeader?.startsWith('Bearer ')) {
@@ -61,6 +63,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Dynamically import supabaseAdmin to avoid build-time issues
+    const { supabaseAdmin } = await import('@/lib/supabase');
+    
     // Verify admin access
     const authHeader = request.headers.get('authorization');
     if (!authHeader?.startsWith('Bearer ')) {
