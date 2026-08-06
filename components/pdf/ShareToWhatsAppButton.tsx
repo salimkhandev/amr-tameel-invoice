@@ -308,7 +308,41 @@ export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
         alert(`WARNING: Invoice was generated but FAILED to save to database!\n\nThe QR code will NOT work!\n\nError: ${supabaseError}`);
       }
 
-      // Download PDF locally for user to attach
+      // Try native share with the PDF (works on mobile)
+      const file = new File([blob], filename, { type: 'application/pdf' });
+      const shareText = `Invoice #${order.invoiceNumber}`;
+
+      const canShareFile =
+        typeof navigator !== 'undefined' &&
+        !!navigator.canShare &&
+        navigator.canShare({ files: [file] });
+
+      if (canShareFile) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: shareText,
+            text: shareText,
+          });
+          // Success — cleanup after successful share
+          setTimeout(() => {
+            cleanupPdf(order.id);
+          }, 5000);
+          return;
+        } catch (shareError) {
+          // User cancelled the share sheet
+          if (shareError instanceof Error && shareError.name === 'AbortError') {
+            setTimeout(() => {
+              cleanupPdf(order.id);
+            }, 5000);
+            return;
+          }
+          console.warn('navigator.share failed, falling back to download:', shareError);
+          // fall through to manual download below
+        }
+      }
+
+      // Fallback: Download PDF + open WhatsApp Web (desktop)
       const localUrl = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = localUrl;
@@ -318,14 +352,13 @@ export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
       window.URL.revokeObjectURL(localUrl);
       document.body.removeChild(a);
 
-      // Open WhatsApp with message — user attaches the downloaded file
       const msg = encodeURIComponent(`Invoice #${order.invoiceNumber}\nPDF has been downloaded. Please attach it to this message.`);
       window.open(`https://wa.me/?text=${msg}`, '_blank');
       
-      // Cleanup the stored PDF after successful download
+      // Cleanup the stored PDF after fallback
       setTimeout(() => {
         cleanupPdf(order.id);
-      }, 5000); // Cleanup after 5 seconds
+      }, 5000);
     } catch (err) {
       console.error('WhatsApp share failed:', err);
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
