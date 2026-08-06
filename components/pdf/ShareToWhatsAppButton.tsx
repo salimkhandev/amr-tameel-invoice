@@ -318,8 +318,35 @@ export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
         throw supabaseError;
       }
 
-      // Download PDF + open wa.me link (without specific number for contact selection)
-      // Note: Web Share API cannot be used here due to async operations breaking user gesture requirement
+      // Try native share (attaches the PDF directly) — works on mobile
+      const file = new File([blob], filename, { type: 'application/pdf' });
+      const shareText = `Invoice #${order.invoiceNumber}`;
+
+      const canShareFile =
+        typeof navigator !== 'undefined' &&
+        !!navigator.canShare &&
+        navigator.canShare({ files: [file] });
+
+      if (canShareFile) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: shareText,
+            text: shareText,
+          });
+          // Success — the native share sheet handled it (user picked WhatsApp, etc.)
+          return;
+        } catch (shareError) {
+          // User cancelled the share sheet — don't fall through to download
+          if (shareError instanceof Error && shareError.name === 'AbortError') {
+            return;
+          }
+          console.warn('navigator.share failed, falling back to download:', shareError);
+          // fall through to manual download below
+        }
+      }
+
+      // Fallback (desktop, or unsupported browsers): download + open WhatsApp Web
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -335,7 +362,7 @@ export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
       // Using wa.me without phone number to let user select contact
       const whatsappUrl = `https://wa.me/?text=${msg}`;
       window.open(whatsappUrl, '_blank');
-      alert('File downloaded, you can attach it in the WhatsApp conversation that opens now.');
+      alert('File downloaded — please attach it manually in the WhatsApp conversation that just opened (this is required on desktop).');
     } catch (err) {
       console.error('WhatsApp share failed:', err);
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
