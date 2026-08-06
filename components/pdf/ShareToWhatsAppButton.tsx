@@ -1,22 +1,26 @@
 'use client';
 
 import React, { useState } from 'react';
-import { DeliveryOrder } from '@/types/delivery-order';
+import { DeliveryOrder, InvoiceStatus } from '@/types/delivery-order';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
+import { addInvoiceToHistory } from '@/lib/history';
 import { Share2, Loader2, WifiOff } from 'lucide-react';
 
 interface ShareToWhatsAppButtonProps {
   templateRef: React.RefObject<HTMLDivElement | null>;
   order: DeliveryOrder;
+  status?: InvoiceStatus;
   className?: string;
 }
 
 export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
   templateRef,
   order,
+  status = 'In Transit',
   className = '',
 }) => {
   const [isProcessing, setIsProcessing] = useState(false);
+  const [loadingStage, setLoadingStage] = useState<'qr' | 'pdf' | null>(null);
   const isOnline = useOnlineStatus();
 
   const handleShare = async () => {
@@ -24,13 +28,15 @@ export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
 
     try {
       setIsProcessing(true);
-
-      // Fetch current status from Supabase first
-      let currentStatus = 'In Transit';
+      
+      // ═══════════════════════════════════════════════════════════
+      // STAGE 0: Fetch current status from Supabase (like RecentHistoryPanel)
+      // ═══════════════════════════════════════════════════════════
+      console.log('Stage 0: Fetching current status from Supabase...');
+      let currentStatus: InvoiceStatus = status;
+      
       try {
-        const statusResponse = await fetch(`/api/invoices/${order.id}?t=${Date.now()}`, {
-          cache: 'no-store',
-        });
+        const statusResponse = await fetch(`/api/invoices/${order.id}`);
         if (statusResponse.ok) {
           const statusData = await statusResponse.json();
           if (statusData.invoice?.status) {
@@ -39,12 +45,20 @@ export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
           }
         }
       } catch (statusError) {
-        console.warn('Failed to fetch current status, using default:', statusError);
+        console.warn('Failed to fetch current status, using provided status:', statusError);
       }
+      
+      // ═══════════════════════════════════════════════════════════
+      // STAGE 1: Generate and verify QR code
+      // ═══════════════════════════════════════════════════════════
+      setLoadingStage('qr');
+      console.log('Stage 1: Generating QR code with status:', currentStatus);
 
-      // Generate QR code with current status and plain invoice ID
+      // Generate QR code components via server API
       let qrCodeUrl = '';
+      let invoiceId = '';
       let customerUrl = '';
+      
       try {
         const qrResponse = await fetch('/api/generate-qr', {
           method: 'POST',
@@ -63,6 +77,7 @@ export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
 
         const qrData = await qrResponse.json();
         qrCodeUrl = qrData.qrCodeUrl;
+        invoiceId = qrData.invoiceId;
         customerUrl = qrData.customerUrl;
         console.log('QR code URL generated:', customerUrl);
       } catch (qrError) {
@@ -88,8 +103,13 @@ export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
         setTimeout(() => reject(new Error('QR code image load timeout')), 10000);
       });
 
-      // Get the HTML content from the template
-      // Clone template DOM to insert QR code
+      // ═══════════════════════════════════════════════════════════
+      // STAGE 2: Prepare DOM and generate PDF
+      // ═══════════════════════════════════════════════════════════
+      setLoadingStage('pdf');
+      console.log('Stage 2: Generating PDF...');
+
+      // Clone template DOM
       const clone = templateRef.current.cloneNode(true) as HTMLElement;
 
       // Show QR code in PDF - use off-screen positioning instead of display:none
@@ -118,16 +138,55 @@ export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
         input.parentNode?.replaceChild(span, input);
       });
 
-      let htmlContent = clone.outerHTML;
+      // Replace static QR code with verified dynamic QR code
+      const qrImages = clone.querySelectorAll('img[alt="QR Code"]');
+      console.log('Found QR code images:', qrImages.length);
       
-      // Convert images to base64 data URLs
+      if (qrImages.length === 0) {
+        throw new Error('QR code image element not found in template');
+      }
+
+      qrImages.forEach((img) => {
+        const htmlImg = img as HTMLElement;
+        console.log('Replacing QR code src with verified URL:', qrCodeUrl);
+        img.setAttribute('src', qrCodeUrl);
+        img.setAttribute('width', '300');
+        img.setAttribute('height', '300');
+        
+        // Force image visibility with inline styles
+        htmlImg.style.display = 'block';
+        htmlImg.style.visibility = 'visible';
+        htmlImg.style.opacity = '1';
+        
+        // Ensure parent container is visible
+        const parent = htmlImg.parentElement;
+        if (parent) {
+          const htmlParent = parent as HTMLElement;
+          htmlParent.style.display = 'flex';
+          htmlParent.style.visibility = 'visible';
+          htmlParent.style.opacity = '1';
+        }
+      });
+
+      // Convert images to base64 data URLs BEFORE getting outerHTML
       const images = clone.querySelectorAll('img');
+      console.log('Processing images for base64 conversion:', images.length);
+      
       for (const img of Array.from(images)) {
         const src = img.getAttribute('src');
         if (src && !src.startsWith('data:')) {
           try {
+            console.log('Converting image to base64:', src);
             const response = await fetch(src);
+            
+            if (!response.ok) {
+              console.error('Failed to fetch image:', src, response.status);
+              continue;
+            }
+            
             const blob = await response.blob();
+            console.log('Image blob size:', blob.size, 'type:', blob.type);
+            
             const reader = new FileReader();
             await new Promise((resolve, reject) => {
               reader.onload = resolve;
@@ -135,17 +194,26 @@ export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
               reader.readAsDataURL(blob);
             });
             const base64 = reader.result as string;
-            htmlContent = htmlContent.replace(src, base64);
+            console.log('Base64 length:', base64.length);
+            
+            // Update the img element's src attribute BEFORE getting outerHTML
+            img.setAttribute('src', base64);
+            console.log('Successfully converted and updated img src:', src);
           } catch (error) {
             console.error('Failed to convert image to base64:', src, error);
+            // Don't throw - continue with other images
           }
         }
       }
-      
+
+      // Now get the HTML content with all images converted to base64
+      let htmlContent = clone.outerHTML;
+
       const cleanDate = order.deliveryDate ? order.deliveryDate.replace(/[/\\?%*:|"<>]/g, '-') : 'date';
       const filename = `invoice-${order.invoiceNumber}-${cleanDate}.pdf`;
 
       // Send to server-side PDF generation
+      console.log('Sending PDF generation request to Puppeteer...');
       const response = await fetch('/api/render-pdf', {
         method: 'POST',
         headers: {
@@ -157,12 +225,86 @@ export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
         }),
       });
 
+      console.log('Response status:', response.status, response.statusText);
+      
       if (!response.ok) {
-        throw new Error('Failed to generate PDF');
+        const errorText = await response.text();
+        console.error('PDF generation failed:', errorText);
+        throw new Error(`Failed to generate PDF: ${response.status} ${response.statusText}`);
       }
 
-      // Get the PDF blob
+      console.log('Getting PDF blob...');
       const blob = await response.blob();
+      console.log('PDF blob received, size:', blob.size, 'type:', blob.type);
+
+      // Add to IndexedDB history
+      try {
+        await addInvoiceToHistory({
+          id: order.id,
+          invoiceNumber: order.invoiceNumber,
+          deliveryDate: order.deliveryDate,
+          createdAt: new Date().toISOString(),
+          order: order,
+          pdfBlob: blob,
+          status: currentStatus,
+          qrCodeUrl: customerUrl || '',
+          encryptedInvoiceId: invoiceId || '',
+        });
+        console.log('Successfully added to history');
+      } catch (historyError) {
+        console.error('Failed to add to history:', historyError);
+      }
+
+      // Store invoice in Supabase - THIS IS CRITICAL FOR QR CODE TO WORK
+      console.log('═══════════════════════════════════════════════════');
+      console.log('SAVING TO SUPABASE - Invoice ID:', order.id);
+      console.log('Status:', currentStatus);
+      console.log('Customer URL:', customerUrl);
+      console.log('═══════════════════════════════════════════════════');
+      
+      try {
+        const supabasePayload = {
+          id: order.id,
+          order_data: order,
+          status: currentStatus,
+          qr_data: {
+            qrCodeUrl: customerUrl || '',
+            encryptedInvoiceId: invoiceId || '',
+          },
+        };
+        
+        console.log('Supabase payload:', JSON.stringify(supabasePayload, null, 2));
+        
+        const supabaseResponse = await fetch('/api/invoices', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(supabasePayload),
+        });
+
+        console.log('Supabase API response status:', supabaseResponse.status, supabaseResponse.statusText);
+        
+        const supabaseData = await supabaseResponse.json();
+        console.log('Supabase storage response:', supabaseData);
+
+        if (!supabaseResponse.ok) {
+          console.error('❌ FAILED TO STORE IN SUPABASE:', supabaseData.error);
+          console.error('Response:', supabaseData);
+          // Show error to user if Supabase storage fails
+          alert(`CRITICAL: Invoice was generated but FAILED to save to database!\n\nThe QR code will NOT work!\n\nError: ${supabaseData.error || 'Unknown error'}\n\nPlease try sharing again or contact support.`);
+          throw new Error('Failed to save invoice to database');
+        } else {
+          console.log('✅ SUCCESS: Invoice stored in Supabase');
+          console.log('Invoice ID:', order.id);
+          console.log('Status:', status);
+          console.log('QR Code will work for customer URL:', customerUrl);
+        }
+      } catch (supabaseError) {
+        console.error('❌ EXCEPTION during Supabase storage:', supabaseError);
+        alert(`CRITICAL: Invoice was generated but FAILED to save to database!\n\nThe QR code will NOT work!\n\nError: ${supabaseError}\n\nPlease check your internet connection and try again.`);
+        throw supabaseError;
+      }
 
       // Primary Path: Web Share API with files
       const file = new File([blob], filename, { type: 'application/pdf' });
@@ -198,8 +340,11 @@ export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
       alert('File downloaded, you can attach it in the WhatsApp conversation that opens now.');
     } catch (err) {
       console.error('WhatsApp share failed:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+      alert(`An error occurred while sharing to WhatsApp: ${errorMessage}. Please try again.`);
     } finally {
       setIsProcessing(false);
+      setLoadingStage(null);
     }
   };
 
@@ -214,7 +359,9 @@ export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
       {isProcessing ? (
         <>
           <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
-          <span className="font-cairo">Preparing...</span>
+          <span className="font-cairo">
+            {loadingStage === 'qr' ? 'Generating QR code...' : 'Generating PDF...'}
+          </span>
         </>
       ) : !isOnline ? (
         <>

@@ -79,7 +79,7 @@ function OrderEditorContent() {
 
             <div className="flex items-center gap-2 hidden md:flex">
               <PdfDownloadButton templateRef={templateRef} order={order} status="In Transit" />
-              <ShareToWhatsAppButton templateRef={templateRef} order={order} />
+              <ShareToWhatsAppButton templateRef={templateRef} order={order} status="In Transit" />
             </div>
           </div>
         </div>

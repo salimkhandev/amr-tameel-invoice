@@ -30,6 +30,7 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
       <ShareToWhatsAppButton
         templateRef={templateRef}
         order={order}
+        status={status as any}
         className="flex-1 py-2 text-xs"
       />
     </div>
