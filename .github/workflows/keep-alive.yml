@@ -2,7 +2,7 @@ name: Infrastructure Keep Alive
 on:
   workflow_dispatch:
   schedule:
-    - cron: '*/10 * * * *'
+    - cron: '0 0 */4 * *'
 permissions:
   contents: write
 jobs:
