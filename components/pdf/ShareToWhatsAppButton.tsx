@@ -230,7 +230,19 @@ export const ShareToWhatsAppButton: React.FC<ShareToWhatsAppButtonProps> = ({
       if (!response.ok) {
         const errorText = await response.text();
         console.error('PDF generation failed:', errorText);
-        throw new Error(`Failed to generate PDF: ${response.status} ${response.statusText}`);
+        let errorMessage = `Failed to generate PDF: ${response.status} ${response.statusText}`;
+        try {
+          const errorJson = JSON.parse(errorText);
+          if (errorJson.error || errorJson.message) {
+            errorMessage = errorJson.error || errorJson.message;
+          }
+        } catch (e) {
+          // If not JSON, use the raw text
+          if (errorText) {
+            errorMessage = errorText;
+          }
+        }
+        throw new Error(errorMessage);
       }
 
       console.log('Getting PDF blob...');
