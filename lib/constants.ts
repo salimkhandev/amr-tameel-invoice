@@ -18,7 +18,7 @@ export const DEFAULT_DELIVERY_ORDER: Omit<DeliveryOrder, 'id' | 'createdAt' | 'u
   car: {
     plateNumber: 'ب ط 6318',
     owner: 'رونق الدولية للنقل والخدمات اللوجستية',
-    idNumber: '۶۰۳۴۸۲۹۲۷۱',
+    idNumber: '6034829271',
   },
   receiver: {
     name: 'رونق الدولية للنقل والخدمات اللوجستية',
