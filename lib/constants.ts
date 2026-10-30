@@ -12,7 +12,7 @@ export const DEFAULT_DELIVERY_ORDER: Omit<DeliveryOrder, 'id' | 'createdAt' | 'u
   company: {
     nameAr: 'رونق الدولية للنقل والخدمات اللوجستية',
     addressAr: '٢٠٠٣ حي العزيزية بحرة',
-    phone: '٠٥٩٠١٨٠١٢٩',
+    phone: '6034829271',
     logoDataUrl: './amar-logo.png',
   },
   car: {
@@ -23,7 +23,7 @@ export const DEFAULT_DELIVERY_ORDER: Omit<DeliveryOrder, 'id' | 'createdAt' | 'u
   receiver: {
     name: 'رونق الدولية للنقل والخدمات اللوجستية',
     address: 'الخرج',
-    mobile: '0590180129',
+    mobile: '6034829271',
   },
   transport: {
     fromCity: 'تبوك',
@@ -33,7 +33,7 @@ export const DEFAULT_DELIVERY_ORDER: Omit<DeliveryOrder, 'id' | 'createdAt' | 'u
   driver: {
     name: 'محمد خان',
     iqamaNumber: '2309163413',
-    mobile: '0590180129',
+    mobile: '6034829271',
   },
   load: {
     type: 'خزانات',
