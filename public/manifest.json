@@ -1,6 +1,6 @@
 {
-  "name": "Amar Tameel",
-  "short_name": "Amar Tameel",
+  "name": "ذاكر تحميل - Zakir Tahmeel",
+  "short_name": "ذاكر تحميل",
   "description": "Create and manage delivery orders with PDF generation",
   "start_url": "/",
   "display": "standalone",

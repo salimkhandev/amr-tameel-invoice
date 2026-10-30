@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from '@/hooks/useSession';
 import { LoginForm } from '@/components/auth/LoginForm';
+import { AppLoader } from '@/components/ui/AppLoader';
 
 export default function LoginPage() {
   const { isAuthenticated, isLoading } = useSession();
@@ -17,9 +18,12 @@ export default function LoginPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="w-8 h-8 border-4 border-[#204978] border-t-transparent rounded-full animate-spin" />
-      </div>
+      <AppLoader
+        fullscreen
+        message="جاري فتح صفحة تسجيل الدخول..."
+        subMessage="ذاكر تحميل • Zakir Tahmeel"
+        size="md"
+      />
     );
   }
 

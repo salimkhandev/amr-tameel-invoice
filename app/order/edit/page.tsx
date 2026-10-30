@@ -11,6 +11,7 @@ import { PdfDownloadButton } from '@/components/pdf/PdfDownloadButton';
 import { DeliveryOrder } from '@/types/delivery-order';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { AppLoader } from '@/components/ui/AppLoader';
 
 function OrderEditorContent() {
   const router = useRouter();
@@ -41,9 +42,12 @@ function OrderEditorContent() {
 
   if (!order) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 font-cairo">
-        <div className="w-8 h-8 border-4 border-[#204978] border-t-transparent rounded-full animate-spin" />
-      </div>
+      <AppLoader
+        fullscreen
+        message="جاري تحميل أمر التحميل..."
+        subMessage="ذاكر تحميل • Zakir Tahmeel"
+        size="md"
+      />
     );
   }
 

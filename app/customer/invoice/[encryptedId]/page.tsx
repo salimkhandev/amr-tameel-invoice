@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { OrderHistoryEntry } from '@/types/delivery-order';
+import { AppLoader } from '@/components/ui/AppLoader';
 import { 
   Package, 
   Truck, 
@@ -114,12 +115,12 @@ export default function CustomerInvoicePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center font-cairo">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-[#204978] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading invoice...</p>
-        </div>
-      </div>
+      <AppLoader
+        fullscreen
+        message="جاري تحميل تفاصيل الفاتورة..."
+        subMessage="ذاكر تحميل • Zakir Tahmeel"
+        size="md"
+      />
     );
   }
 

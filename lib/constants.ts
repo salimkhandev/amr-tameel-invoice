@@ -10,20 +10,20 @@ export const DEFAULT_DELIVERY_ORDER: Omit<DeliveryOrder, 'id' | 'createdAt' | 'u
   receiptDate: '20-05-2026',
   deliveryDate: '25-05-2026',
   company: {
-    nameAr: 'شركة ليونة للتجارة',
-    addressAr: '٢١٨١ حي العزيزية بحرة',
-    phone: '٠٥٤٧٧٧٧٩٦٣',
+    nameAr: 'رونق الدولية للنقل والخدمات اللوجستية',
+    addressAr: '٢٠٠٣ حي العزيزية بحرة',
+    phone: '٠٥٩٠١٨٠١٢٩',
     logoDataUrl: './amar-logo.png',
   },
   car: {
     plateNumber: 'ب ط 6318',
-    owner: 'شركة ليونة للتجارة',
-    idNumber: '7002526817',
+    owner: 'رونق الدولية للنقل والخدمات اللوجستية',
+    idNumber: '6034829271',
   },
   receiver: {
-    name: 'شركة ليونة للتجارة',
+    name: 'رونق الدولية للنقل والخدمات اللوجستية',
     address: 'الخرج',
-    mobile: '0547777963',
+    mobile: '0590180129',
   },
   transport: {
     fromCity: 'تبوك',
@@ -33,7 +33,7 @@ export const DEFAULT_DELIVERY_ORDER: Omit<DeliveryOrder, 'id' | 'createdAt' | 'u
   driver: {
     name: 'محمد خان',
     iqamaNumber: '2309163413',
-    mobile: '0547777963',
+    mobile: '0590180129',
   },
   load: {
     type: 'خزانات',

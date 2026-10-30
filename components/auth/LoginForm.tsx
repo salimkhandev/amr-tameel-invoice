@@ -28,10 +28,19 @@ export const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-md p-6 bg-white rounded-xl shadow-lg border border-gray-100 font-cairo">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-[#204978]">Login</h2>
-        <p className="text-sm text-gray-500 mt-1">Amar Tameel</p>
+    <div className="w-full max-w-md p-6 sm:p-8 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-100 font-cairo">
+      <div className="flex flex-col items-center text-center mb-6">
+        <div className="w-20 h-20 mb-3 rounded-2xl bg-gradient-to-br from-[#204978] to-[#18365a] p-2 flex items-center justify-center shadow-lg shadow-blue-900/20">
+          <img
+            src="/amar-logo.png"
+            alt="ذاكر تحميل"
+            className="w-full h-full object-contain filter brightness-0 invert"
+          />
+        </div>
+        <h2 className="text-2xl font-extrabold text-[#204978]">ذاكر تحميل</h2>
+        <p className="text-xs font-semibold text-gray-500 mt-1">
+          نظام إدارة وطباعة أوامر التحميل والشحن اللوجستي
+        </p>
       </div>
 
       {error && (

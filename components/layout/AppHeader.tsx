@@ -33,10 +33,18 @@ export const AppHeader: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 py-2 sm:py-3 flex justify-between items-center">
         {/* Left: Brand & PWA Install */}
         <div className="flex items-center gap-3">
-          <Link href="/dashboard" className="flex items-center gap-2 font-bold text-lg hover:opacity-90">
-            <FileText className="w-6 h-6 text-blue-300" />
-            <span className="hidden sm:inline">Amar Tameel</span>
-            <span className="sm:hidden">Amar Tameel</span>
+          <Link href="/dashboard" className="flex items-center gap-2.5 font-bold text-lg hover:opacity-95 transition-opacity">
+            <div className="w-8 h-8 rounded-lg bg-white/10 p-1 flex items-center justify-center border border-white/20 shadow-sm">
+              <img
+                src="/amar-logo.png"
+                alt="ذاكر تحميل"
+                className="w-full h-full object-contain filter brightness-0 invert"
+              />
+            </div>
+            <div className="flex flex-col">
+              <span className="font-extrabold text-base sm:text-lg leading-tight tracking-wide">ذاكر تحميل</span>
+              <span className="text-[10px] text-blue-200 font-medium leading-none hidden sm:inline">Zakir Tahmeel</span>
+            </div>
           </Link>
 
           {/* PWA Install Button */}

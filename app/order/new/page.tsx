@@ -7,6 +7,8 @@ import { DEFAULT_DELIVERY_ORDER } from '@/lib/constants';
 import { DeliveryOrder } from '@/types/delivery-order';
 import { getRecentInvoices } from '@/lib/history';
 
+import { AppLoader } from '@/components/ui/AppLoader';
+
 export default function NewOrderPage() {
   const router = useRouter();
   const [orderId, setOrderId] = useState<string | null>(null);
@@ -68,11 +70,11 @@ export default function NewOrderPage() {
   }, [orderId, router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 font-cairo">
-      <div className="flex flex-col items-center gap-3">
-        <div className="w-8 h-8 border-4 border-[#204978] border-t-transparent rounded-full animate-spin" />
-        <span className="text-sm font-semibold text-gray-600">Preparing new invoice...</span>
-      </div>
-    </div>
+    <AppLoader
+      fullscreen
+      message="جاري تجهيز أمر التحميل الجديد..."
+      subMessage="ذاكر تحميل • Zakir Tahmeel"
+      size="md"
+    />
   );
 }

@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Amar Tameel',
-  description: 'Application for creating and exporting delivery orders in PDF format',
+  title: 'ذاكر تحميل - Zakir Tahmeel',
+  description: 'نظام إدارة وطباعة أوامر التحميل والشحن اللوجستي',
   manifest: '/manifest.json',
 };
 
@@ -36,7 +36,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="1024x1024" href="/apple-touch-icon-1024.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Amar Tameel" />
+        <meta name="apple-mobile-web-app-title" content="ذاكر تحميل" />
       </head>
       <body className="bg-gray-100 font-cairo text-slate-900 min-h-screen antialiased">
         {children}
