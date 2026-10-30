@@ -47,16 +47,16 @@ export default function DashboardPage() {
                 <div className="relative z-10 flex flex-col gap-3">
                   <div className="flex items-center gap-2">
                     <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-200 text-xs font-semibold border border-blue-400/30">
-                      لوحة التحكم الرئيسية
+                      Main Dashboard
                     </span>
                     <span className="text-xs text-blue-200">Zakir Tahmeel</span>
                   </div>
 
                   <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-wide">
-                    أهلاً بك، {user?.full_name || user?.username}!
+                    Welcome back, {user?.full_name || user?.username}!
                   </h2>
                   <p className="text-xs sm:text-sm text-blue-100/90 leading-relaxed max-w-xl">
-                    منصة إدارة وإنشاء أوامر التحميل والشحن اللوجستي. اضغط على "إنشاء أمر تحميل جديد" لبدء تحرير الفاتورة وطباعتها بصيغة PDF الرسمية.
+                    Logistics delivery order and shipment management platform. Click "Create New Delivery Order" to generate, edit, and print official invoices.
                   </p>
                 </div>
               </div>
@@ -67,7 +67,7 @@ export default function DashboardPage() {
                 className="group flex items-center justify-center gap-3 px-6 py-3.5 bg-gradient-to-r from-[#204978] to-[#1a3c63] hover:from-[#18365a] hover:to-[#122740] text-white font-extrabold rounded-xl shadow-md hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 text-sm sm:text-base border border-blue-900/40"
               >
                 <PlusCircle className="w-5 h-5 text-blue-300 group-hover:rotate-90 transition-transform duration-300" />
-                <span>إنشاء أمر تحميل جديد • Create New Invoice</span>
+                <span>Create New Delivery Order</span>
               </Link>
 
               {/* User Management Panel - Only for admins */}

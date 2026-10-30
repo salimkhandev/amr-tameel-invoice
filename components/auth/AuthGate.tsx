@@ -24,8 +24,8 @@ export const AuthGate: React.FC<AuthGateProps> = ({ children }) => {
     return (
       <AppLoader
         fullscreen
-        message="التحقق من تسجيل الدخول..."
-        subMessage="ذاكر تحميل • Zakir Tahmeel"
+        message="Verifying session..."
+        subMessage="Zakir Tahmeel • Logistics Delivery Order"
         size="md"
       />
     );

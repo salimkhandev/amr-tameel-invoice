@@ -72,8 +72,8 @@ export default function NewOrderPage() {
   return (
     <AppLoader
       fullscreen
-      message="جاري تجهيز أمر التحميل الجديد..."
-      subMessage="ذاكر تحميل • Zakir Tahmeel"
+      message="Preparing new delivery order..."
+      subMessage="Zakir Tahmeel • Logistics Delivery Order"
       size="md"
     />
   );

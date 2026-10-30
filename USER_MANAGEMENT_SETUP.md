@@ -2,7 +2,7 @@
 
 ## 🚀 Setup Instructions
 
-### 1. Supabase Database SetupW
+### 1. Supabase Database Setup
 
 1. **Create a new Supabase project** at [supabase.com](https://supabase.com)
 2. **Go to SQL Editor** in your Supabase dashboard

@@ -10,8 +10,8 @@ interface AppLoaderProps {
 }
 
 export const AppLoader: React.FC<AppLoaderProps> = ({
-  message = 'جاري التحميل...',
-  subMessage = 'ذاكر تحميل • Zakir Tahmeel',
+  message = 'Loading...',
+  subMessage = 'Zakir Tahmeel • Logistics Delivery Order',
   fullscreen = false,
   size = 'md',
 }) => {

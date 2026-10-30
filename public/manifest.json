@@ -1,6 +1,6 @@
 {
-  "name": "ذاكر تحميل - Zakir Tahmeel",
-  "short_name": "ذاكر تحميل",
+  "name": "Zakir Tahmeel - Delivery Order System",
+  "short_name": "Zakir Tahmeel",
   "description": "Create and manage delivery orders with PDF generation",
   "start_url": "/",
   "display": "standalone",

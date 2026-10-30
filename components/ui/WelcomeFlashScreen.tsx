@@ -53,21 +53,21 @@ export const WelcomeFlashScreen: React.FC<WelcomeFlashScreenProps> = ({
           <div className="absolute -inset-2 bg-blue-400/20 rounded-3xl blur-xl animate-pulse" />
           <img
             src="/amar-logo.png"
-            alt="ذاكر تحميل"
+            alt="Zakir Tahmeel"
             className="w-full h-full object-contain filter brightness-0 invert relative z-10"
           />
         </div>
 
         <h1 className="text-3xl sm:text-4xl font-extrabold text-white text-center tracking-wide drop-shadow-md">
-          ذاكر تحميل
+          Zakir Tahmeel
         </h1>
         <p className="text-sm font-semibold text-blue-200 mt-1 drop-shadow">
-          Zakir Tahmeel • Logistics Delivery Order System
+          Logistics Delivery Order System
         </p>
 
         {userName && (
           <div className="mt-4 px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-sm border border-white/20 text-white text-sm font-semibold">
-            مرحباً بك، {userName}
+            Welcome, {userName}
           </div>
         )}
       </div>

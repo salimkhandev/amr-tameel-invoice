@@ -117,8 +117,8 @@ export default function CustomerInvoicePage() {
     return (
       <AppLoader
         fullscreen
-        message="جاري تحميل تفاصيل الفاتورة..."
-        subMessage="ذاكر تحميل • Zakir Tahmeel"
+        message="Loading invoice details..."
+        subMessage="Zakir Tahmeel • Logistics Delivery Order"
         size="md"
       />
     );

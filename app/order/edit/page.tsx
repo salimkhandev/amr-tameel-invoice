@@ -44,8 +44,8 @@ function OrderEditorContent() {
     return (
       <AppLoader
         fullscreen
-        message="جاري تحميل أمر التحميل..."
-        subMessage="ذاكر تحميل • Zakir Tahmeel"
+        message="Loading delivery order..."
+        subMessage="Zakir Tahmeel • Logistics Delivery Order"
         size="md"
       />
     );

@@ -37,13 +37,13 @@ export const AppHeader: React.FC = () => {
             <div className="w-8 h-8 rounded-lg bg-white/10 p-1 flex items-center justify-center border border-white/20 shadow-sm">
               <img
                 src="/amar-logo.png"
-                alt="ذاكر تحميل"
+                alt="Zakir Tahmeel"
                 className="w-full h-full object-contain filter brightness-0 invert"
               />
             </div>
             <div className="flex flex-col">
-              <span className="font-extrabold text-base sm:text-lg leading-tight tracking-wide">ذاكر تحميل</span>
-              <span className="text-[10px] text-blue-200 font-medium leading-none hidden sm:inline">Zakir Tahmeel</span>
+              <span className="font-extrabold text-base sm:text-lg leading-tight tracking-wide">Zakir Tahmeel</span>
+              <span className="text-[10px] text-blue-200 font-medium leading-none hidden sm:inline">Logistics Delivery Order</span>
             </div>
           </Link>
 

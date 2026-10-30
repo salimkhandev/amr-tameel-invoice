@@ -22,8 +22,8 @@ export default function RootPage() {
   return (
     <AppLoader
       fullscreen
-      message="جاري الدخول إلى النظام..."
-      subMessage="ذاكر تحميل • Zakir Tahmeel"
+      message="Entering system..."
+      subMessage="Zakir Tahmeel • Logistics Delivery Order"
       size="lg"
     />
   );

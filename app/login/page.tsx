@@ -20,8 +20,8 @@ export default function LoginPage() {
     return (
       <AppLoader
         fullscreen
-        message="جاري فتح صفحة تسجيل الدخول..."
-        subMessage="ذاكر تحميل • Zakir Tahmeel"
+        message="Loading login..."
+        subMessage="Zakir Tahmeel • Logistics Delivery Order"
         size="md"
       />
     );
