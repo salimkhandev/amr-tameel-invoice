@@ -12,13 +12,13 @@ export const DEFAULT_DELIVERY_ORDER: Omit<DeliveryOrder, 'id' | 'createdAt' | 'u
   company: {
     nameAr: 'رونق الدولية للنقل والخدمات اللوجستية',
     addressAr: '٢٠٠٣ حي العزيزية بحرة',
-    phone: '6034829271',
+    phone: '۶۰۳۴۸۲۹۲۷۱',
     logoDataUrl: './amar-logo.png',
   },
   car: {
     plateNumber: 'ب ط 6318',
     owner: 'رونق الدولية للنقل والخدمات اللوجستية',
-    idNumber: '6034829271',
+    idNumber: '۶۰۳۴۸۲۹۲۷۱',
   },
   receiver: {
     name: 'رونق الدولية للنقل والخدمات اللوجستية',

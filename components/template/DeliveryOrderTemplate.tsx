@@ -198,7 +198,7 @@ export const DeliveryOrderTemplate = forwardRef<HTMLDivElement, DeliveryOrderTem
                       <E value={order.car.owner} onChange={F ? (v) => setGroup('car', 'owner', v) : undefined} dir="rtl" />
                     </div>
                     <div className="w-[33.33%] p-[6px] px-[10px] font-['Roboto',sans-serif]">
-                      <E value={order.car.idNumber} onChange={F ? (v) => setGroup('car', 'idNumber', v) : undefined} dir="ltr" />
+                      <E value={order.car.idNumber} onChange={F ? (v) => setGroup('car', 'idNumber', v) : undefined} dir="auto" />
                     </div>
                   </div>
                 </div>
